@@ -1,0 +1,44 @@
+# Initial choices for the proposal presentation. Record any changes with each run.
+datasets:
+  cora:
+    root: data/cora
+    split: public
+    purpose: pipeline_check
+  ogbn-arxiv:
+    root: data/ogbn-arxiv
+    split: official_time
+    make_undirected: true
+    coalesce_edges: true
+    purpose: main_benchmark
+
+model:
+  library: pytorch_geometric
+  type: GCN
+  layers: 2
+  hidden_channels: 128
+  dropout: 0.5
+  self_loops: true
+  normalize: true
+
+training:
+  mode: full_batch
+  optimizer: Adam
+  learning_rate: 0.01
+  weight_decay: 0.0005
+  max_epochs: 300
+  early_stopping_patience: 50
+  selection_metric: validation_accuracy
+  seeds: [0, 1, 2]
+
+presentation_baseline:
+  method: random_undirected_edge_removal
+  removal_fractions: [0.0, 0.4]
+  retrain_for_each_budget: true
+
+timing:
+  workload: full_graph_forward
+  data_on_device: true
+  warmup_runs: 10
+  measured_runs: 30
+  summary: median_ms
+  gpu_method: cuda_events

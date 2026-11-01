@@ -1,0 +1,22 @@
+# Downloaded benchmark data
+/data/*
+!/data/.gitkeep
+
+# Experiment outputs
+/runs/*
+!/runs/.gitkeep
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+
+# Editor and OS
+.DS_Store
+Thumbs.db
+.vscode/
+
+/data/*
+
+.venv/
