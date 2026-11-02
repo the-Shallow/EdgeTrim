@@ -9,8 +9,8 @@ class GCN(nn.Module):
         self.conv2 = GCNConv(hidden_channels, out_channels)
         self.dropout = dropout
 
-    def forward(self, x, edge_index):
-        x = self.conv1(x, edge_index)
+    def forward(self, x, edge_index, edge_weight=None):
+        x = self.conv1(x, edge_index, edge_weight)
         x = F.relu(x)
         x = F.dropout(x, p=self.dropout, training=self.training)
-        return self.conv2(x, edge_index)
+        return self.conv2(x, edge_index, edge_weight)

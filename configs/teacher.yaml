@@ -42,3 +42,14 @@ timing:
   measured_runs: 30
   summary: median_ms
   gpu_method: cuda_events
+
+# H1: teacher-guided edge selection versus simple pruning baselines (scripts/run_h1.py).
+h1:
+  methods: [random, degree, feature_similarity, teacher_gradient]
+  removal_fractions: [0.2, 0.4, 0.6]
+  budget_unit: undirected_connection   # self-loops excluded; kept count is exact
+  tie_break: seeded_random_permutation
+  degree_score: inverse_sqrt_degree_product   # removes hub-to-hub connections first
+  feature_score: cosine_similarity
+  teacher_score: first_order_loss_increase   # loss = CE against teacher's own predictions on all nodes
+  retrain_for_each_budget: true

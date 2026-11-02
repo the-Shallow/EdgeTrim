@@ -1,0 +1,111 @@
+{
+  "dataset": "ogbn-arxiv",
+  "seeds": [
+    0
+  ],
+  "removal_fractions": [
+    0.4
+  ],
+  "methods": [
+    "random",
+    "degree",
+    "feature_similarity",
+    "teacher_gradient"
+  ],
+  "config": {
+    "datasets": {
+      "cora": {
+        "root": "data/cora",
+        "split": "public",
+        "purpose": "pipeline_check"
+      },
+      "ogbn-arxiv": {
+        "root": "data/ogbn-arxiv",
+        "split": "official_time",
+        "make_undirected": true,
+        "coalesce_edges": true,
+        "purpose": "main_benchmark"
+      }
+    },
+    "model": {
+      "library": "pytorch_geometric",
+      "type": "GCN",
+      "layers": 2,
+      "hidden_channels": 128,
+      "dropout": 0.5,
+      "self_loops": true,
+      "normalize": true
+    },
+    "training": {
+      "mode": "full_batch",
+      "optimizer": "Adam",
+      "learning_rate": 0.01,
+      "weight_decay": 0.0005,
+      "max_epochs": 300,
+      "early_stopping_patience": 50,
+      "selection_metric": "validation_accuracy",
+      "seeds": [
+        0,
+        1,
+        2
+      ]
+    },
+    "presentation_baseline": {
+      "method": "random_undirected_edge_removal",
+      "removal_fractions": [
+        0.0,
+        0.4
+      ],
+      "retrain_for_each_budget": true
+    },
+    "timing": {
+      "workload": "full_graph_forward",
+      "data_on_device": true,
+      "warmup_runs": 10,
+      "measured_runs": 30,
+      "summary": "median_ms",
+      "gpu_method": "cuda_events"
+    },
+    "h1": {
+      "methods": [
+        "random",
+        "degree",
+        "feature_similarity",
+        "teacher_gradient"
+      ],
+      "removal_fractions": [
+        0.2,
+        0.4,
+        0.6
+      ],
+      "budget_unit": "undirected_connection",
+      "tie_break": "seeded_random_permutation",
+      "degree_score": "inverse_sqrt_degree_product",
+      "feature_score": "cosine_similarity",
+      "teacher_score": "first_order_loss_increase",
+      "retrain_for_each_budget": true
+    }
+  },
+  "graph": {
+    "num_nodes": 169343,
+    "num_features": 128,
+    "num_classes": 40,
+    "loaded_directed_edges": 1166243,
+    "undirected_connections": 1157799,
+    "directed_edges_used": 2315598,
+    "train_val_test": [
+      90941,
+      29799,
+      48603
+    ]
+  },
+  "versions": {
+    "python": "3.12.15",
+    "torch": "2.15.0",
+    "torch_geometric": "2.8.1"
+  },
+  "hardware": {
+    "device": "cpu",
+    "name": "arm"
+  }
+}

@@ -23,7 +23,9 @@ EdgeTrim/
 3. Save configuration, seed, best checkpoint, train/validation/test accuracy, training time, and inference measurements under `runs/`.
 4. Add random edge pruning and retrain the same model at 40% edge removal. Compare it with the unpruned teacher using the same evaluation protocol.
 
-The repository currently contains the layout and experiment specification. Training code and measured results are the next checkpoint; no performance numbers have been produced yet.
+The Cora teacher and the 40% random baseline are implemented in `scripts/`. The H1 comparison (teacher-guided edge selection against random, degree-based, and feature-similarity pruning at matched edge budgets) is in `scripts/run_h1.py`; see [scripts/README.md](scripts/README.md).
+
+Scripts import the `edgetrim` package from `src/`, so run them from the repository root with `PYTHONPATH=src`.
 
 ## Experiment conventions
 
