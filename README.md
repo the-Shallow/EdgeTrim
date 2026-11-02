@@ -23,7 +23,7 @@ EdgeTrim/
 3. Save configuration, seed, best checkpoint, train/validation/test accuracy, training time, and inference measurements under `runs/`.
 4. Add random edge pruning and retrain the same model at 40% edge removal. Compare it with the unpruned teacher using the same evaluation protocol.
 
-The repository currently contains the layout and experiment specification. Training code and measured results are the next checkpoint; no performance numbers have been produced yet.
+The repository has standalone training entry points for the Cora pipeline check and the ogbn-arxiv main benchmark. No performance numbers should be reported until a run has completed and its artifacts under `runs/` have been reviewed.
 
 ## Run on NC State Hazel HPC
 
@@ -39,21 +39,33 @@ cd EdgeTrim
 
 The login banner says `/share` is not backed up and files not accessed for 30 days are automatically deleted. Keep important results elsewhere.
 
-Hazel recommends Conda environments. Initialize Conda once per account if needed (`module load conda`, `conda init bash`, then log out and back in). On a login node, create the environment and install the project dependencies:
+Hazel recommends Conda environments. Initialize Conda once per account if needed (`module load conda`, `conda init bash`, then log out and back in). For this project, the environment and package cache are in scratch:
 
 ```bash
 module load conda
-conda create --prefix /usr/local/usrapps/GROUP/kpatel53/edgetrim python=3.11 pip -y
-conda activate /usr/local/usrapps/GROUP/kpatel53/edgetrim
+mkdir -p /share/csc591038f26/kpatel53/conda/pkgs /share/csc591038f26/kpatel53/envs
+export CONDA_PKGS_DIRS=/share/csc591038f26/kpatel53/conda/pkgs
+conda create --prefix /share/csc591038f26/kpatel53/envs/edgetrim python=3.11 pip -y
+conda activate /share/csc591038f26/kpatel53/envs/edgetrim
 python -m pip install -r requirements.txt
 export PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}"
 ```
 
-Replace `GROUP` in the environment path with your project group. PyTorch/PyG packaging depends on the selected Python and CUDA stack; check `python -c "import torch; print(torch.__version__, torch.cuda.is_available())"` in an allocated GPU job. If installation selects a CPU-only PyTorch wheel, install the CUDA-compatible PyTorch/PyG builds following the [PyG installation guide](https://pytorch-geometric.readthedocs.io/en/latest/install/installation.html).
+The current environment reports PyTorch `2.15.0+cu132`, matching Hazel's CUDA 13.2 module. `torch.cuda.is_available()` is expected to be false on a login node; verify it from a GPU job. Scratch is not backed up and inactive files can be deleted, so keep important results elsewhere.
 
-Edit the environment path in the job file to match your project, then submit from the repository root with `sbatch hpc/train_cora_teacher.slurm`. The starter script requests one A100; change the typed GPU request to a GPU model available to your project, or use a CPU Slurm job if you do not have GPU access. Do not run training on the login node. Check jobs with `squeue -u "$USER"`; Slurm writes logs in the checkout and checkpoints under `runs/`.
+## Run ogbn-arxiv on Hazel
 
-The current training entry points are standalone Cora scripts (`scripts/train_teacher.py`, `scripts/train_random_baseline.py`, and `scripts/train_degree_baseline.py`). They do not yet accept dataset, seed, or run-directory arguments, and the ogbn-arxiv experiment described above is not implemented. The job file below launches the existing Cora teacher script; the experiment interface should be generalized before scheduling a multi-seed or ogbn-arxiv sweep.
+The compute nodes do not have outside network access, so stage ogbn-arxiv first through Hazel's `xfer` partition, then make the training array depend on successful staging:
+
+```bash
+cd /share/csc591038f26/kpatel53/EdgeTrim
+STAGE_JOB=$(sbatch --parsable hpc/stage_ogbn_arxiv.slurm)
+sbatch --dependency=afterok:$STAGE_JOB hpc/train_ogbn_arxiv.slurm
+```
+
+The training script runs seeds 0, 1, and 2 as a Slurm array, one task at a time, requesting one A100 in `gpu_partners` with `short_gpu`. That QOS has a two-hour limit. Submit production work with `sbatch`, not on a login node. Monitor it with `squeue -u "$USER"` or `sq --pend` / `sq --run`; use `sj JOBID`, `sjs JOBID`, and `seff JOBID` for job details and resource use. Logs, configs, metrics, and checkpoints are written under `runs/`.
+
+Hazel currently reports a Slurm topology error for interactive A100 allocations (`Requested topology configuration is not available`) despite free A100s on `gpu26`. Resolve that with HPC support before relying on a GPU allocation.
 
 ## Experiment conventions
 
@@ -63,4 +75,4 @@ The current training entry points are standalone Cora scripts (`scripts/train_te
 - Record package versions, hardware, graph preprocessing, seed, and timing method with every run.
 - Measure warm inference with graph data already on the target device. Keep loading and preprocessing time separate.
 
-PyTorch and PyG installation depends on the local CUDA/PyTorch combination; use the [official PyG installation guide](https://pytorch-geometric.readthedocs.io/en/latest/install/installation.html) when implementation begins.
+For current resource and job syntax, see Hazel's [Slurm job guide](https://hpc.ncsu.edu/RunningJobs/RunningJobs.php), [GPU guide](https://hpc.ncsu.edu/RunningJobs/Gpu.php), and [data staging guide](https://hpc.ncsu.edu/RunningJobs/DataStaging.php).

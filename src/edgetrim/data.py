@@ -8,7 +8,7 @@ def load_cora(root: str | Path = "data/cora"):
     return dataset[0]
 
 
-def load_ogbin_arxiv(root: str | Path = "data/ogbn-arxiv"):
+def load_ogbn_arxiv(root: str | Path = "data/ogbn-arxiv"):
     dataset = PygNodePropPredDataset(name="ogbn-arxiv", root=str(root))
     data = dataset[0]
     split = dataset.get_idx_split()
