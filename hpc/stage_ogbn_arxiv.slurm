@@ -2,7 +2,9 @@
 #SBATCH --job-name=edgetrim-ogbn-stage
 #SBATCH --output=runs/ogbn-stage-%j.out
 #SBATCH --error=runs/ogbn-stage-%j.err
+#SBATCH --account=csc591038f26_cpu
 #SBATCH --partition=xfer
+#SBATCH --qos=xfer
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=8G
@@ -11,8 +13,8 @@
 set -euo pipefail
 
 cd "$SLURM_SUBMIT_DIR"
-source ~/.bashrc
 module load conda
+source "$(conda info --base)/etc/profile.d/conda.sh"
 conda activate /share/csc591038f26/kpatel53/envs/edgetrim
 export PYTHONPATH="$SLURM_SUBMIT_DIR/src${PYTHONPATH:+:$PYTHONPATH}"
 

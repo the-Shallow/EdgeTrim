@@ -1,4 +1,4 @@
-"""Train the full-graph two-layer GCN teacher on official ogbn-arxiv splits."""
+"""Train an ogbn-arxiv GCN with unpruned, random, or degree-based edges."""
 
 import argparse
 import json
@@ -14,6 +14,7 @@ from torch_geometric.utils import coalesce, to_undirected
 
 from edgetrim.data import load_ogbn_arxiv
 from edgetrim.model import GCN
+from edgetrim.pruning import degree_prune_edges, random_prune_connections
 
 
 def parse_args():
@@ -21,6 +22,12 @@ def parse_args():
     parser.add_argument("--root", default="data/ogbn-arxiv")
     parser.add_argument("--run-dir", default=None)
     parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument(
+        "--method",
+        choices=("unpruned", "random", "degree"),
+        default="unpruned",
+    )
+    parser.add_argument("--removal-fraction", type=float, default=0.4)
     parser.add_argument("--hidden-channels", type=int, default=128)
     parser.add_argument("--dropout", type=float, default=0.5)
     parser.add_argument("--learning-rate", type=float, default=0.01)
@@ -28,6 +35,11 @@ def parse_args():
     parser.add_argument("--max-epochs", type=int, default=300)
     parser.add_argument("--patience", type=int, default=50)
     return parser.parse_args()
+
+
+def count_undirected_connections(edge_index):
+    source, target = edge_index
+    return int((source < target).sum().item())
 
 
 def ogb_accuracy(evaluator, logits, labels, indices):
@@ -40,6 +52,8 @@ def main():
     args = parse_args()
     if not torch.cuda.is_available():
         raise RuntimeError("A CUDA GPU is required; submit this script as a Slurm GPU job.")
+    if not 0.0 <= args.removal_fraction < 1.0:
+        raise ValueError("--removal-fraction must be in the interval [0, 1).")
 
     random.seed(args.seed)
     np.random.seed(args.seed)
@@ -55,7 +69,40 @@ def main():
     preprocess_started = time.perf_counter()
     edge_index = to_undirected(data.edge_index, num_nodes=data.num_nodes)
     edge_index = coalesce(edge_index, num_nodes=data.num_nodes)
+    unpruned_edge_count = int(edge_index.size(1))
+    unpruned_connection_count = count_undirected_connections(edge_index)
+
+    if args.method == "unpruned":
+        connections_to_keep = unpruned_connection_count
+    else:
+        connections_to_keep = round(
+            unpruned_connection_count * (1.0 - args.removal_fraction)
+        )
+        if args.method == "random":
+            edge_index = random_prune_connections(
+                edge_index,
+                connections_to_keep=connections_to_keep,
+                seed=args.seed,
+            )
+        elif args.method == "degree":
+            edge_index = degree_prune_edges(
+                edge_index,
+                connections_to_keep=connections_to_keep,
+            )
+
+    retained_edge_count = int(edge_index.size(1))
+    retained_connection_count = count_undirected_connections(edge_index)
+    actual_removal_fraction = 1.0 - (
+        retained_connection_count / unpruned_connection_count
+    )
     preprocessing_seconds = time.perf_counter() - preprocess_started
+
+    print(
+        f"method={args.method} seed={args.seed} "
+        f"connections={unpruned_connection_count}->{retained_connection_count} "
+        f"edges={unpruned_edge_count}->{retained_edge_count}",
+        flush=True,
+    )
 
     x = data.x.to(device)
     y = data.y.view(-1).long().to(device)
@@ -129,15 +176,26 @@ def main():
             "peak_gpu_memory_bytes": int(torch.cuda.max_memory_allocated(device)),
         }
 
-    run_dir = Path(args.run_dir or f"runs/ogbn_arxiv_seed{args.seed}")
+    run_dir = Path(
+        args.run_dir or f"runs/ogbn_arxiv_{args.method}_seed{args.seed}"
+    )
     run_dir.mkdir(parents=True, exist_ok=True)
     config = {
         "dataset": "ogbn-arxiv",
+        "method": args.method,
         "data_root": args.root,
         "split": "official OGB train/valid/test",
         "edge_preprocessing": "make undirected, then coalesce duplicates",
         "raw_edge_count": raw_edge_count,
-        "processed_edge_count": int(edge_index.size(1)),
+        "unpruned_edge_count": unpruned_edge_count,
+        "retained_edge_count": retained_edge_count,
+        "unpruned_connection_count": unpruned_connection_count,
+        "retained_connection_count": retained_connection_count,
+        "connections_to_keep": connections_to_keep,
+        "removal_fraction_requested": (
+            0.0 if args.method == "unpruned" else args.removal_fraction
+        ),
+        "removal_fraction_actual": actual_removal_fraction,
         "num_nodes": int(data.num_nodes),
         "num_features": int(data.num_features),
         "num_classes": int(y.max().item()) + 1,

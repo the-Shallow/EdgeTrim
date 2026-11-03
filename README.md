@@ -55,17 +55,21 @@ The current environment reports PyTorch `2.15.0+cu132`, matching Hazel's CUDA 13
 
 ## Run ogbn-arxiv on Hazel
 
-The compute nodes do not have outside network access, so stage ogbn-arxiv first through Hazel's `xfer` partition, then make the training array depend on successful staging:
+The compute nodes do not have outside network access, so stage ogbn-arxiv first through Hazel's `xfer` partition. Run array task 0 as an unpruned seed-0 validation job, inspect it, and then submit the other eight runs:
 
 ```bash
 cd /share/csc591038f26/kpatel53/EdgeTrim
 STAGE_JOB=$(sbatch --parsable hpc/stage_ogbn_arxiv.slurm)
-sbatch --dependency=afterok:$STAGE_JOB hpc/train_ogbn_arxiv.slurm
+CHECK_JOB=$(sbatch --parsable --dependency=afterok:$STAGE_JOB --array=0 hpc/train_ogbn_arxiv.slurm)
+echo "stage=$STAGE_JOB validation=$CHECK_JOB"
+
+# After array task 0 completes successfully:
+sbatch --array=1-8%1 hpc/train_ogbn_arxiv.slurm
 ```
 
-The training script runs seeds 0, 1, and 2 as a Slurm array, one task at a time, requesting one A100 in `gpu_partners` with `short_gpu`. That QOS has a two-hour limit. Submit production work with `sbatch`, not on a login node. Monitor it with `squeue -u "$USER"` or `sq --pend` / `sq --run`; use `sj JOBID`, `sjs JOBID`, and `seff JOBID` for job details and resource use. Logs, configs, metrics, and checkpoints are written under `runs/`.
+The full array contains nine tasks: unpruned, random 40% removal, and degree-based 40% removal, each with seeds 0, 1, and 2. It runs one task at a time and requests one A100 from the batch-only `gpu` partition with the `gpu` QOS. Submit production work with `sbatch`, not on a login node. Monitor it with `squeue -u "$USER"` or `sq --pend` / `sq --run`; use `sj JOBID`, `sjs JOBID`, and `seff JOBID` for job details and resource use. Logs, configs, metrics, and checkpoints are written under `runs/`.
 
-Hazel currently reports a Slurm topology error for interactive A100 allocations (`Requested topology configuration is not available`) despite free A100s on `gpu26`. Resolve that with HPC support before relying on a GPU allocation.
+An A100 batch smoke test completed successfully on `gpu13` with PyTorch 2.15.0+cu132 and PyTorch Geometric. Interactive A100 requests may still fail with a Slurm topology error, so use the batch-only `gpu` partition for these experiments.
 
 ## Experiment conventions
 
