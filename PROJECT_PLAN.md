@@ -4,7 +4,9 @@
 
 Study whether a GNN teacher trained on the original graph can guide edge removal, and whether knowledge distillation can help a student retain accuracy on the resulting sparse graph. The eventual comparison is accuracy and measured inference cost at the same edge budgets.
 
-The immediate goal is narrower: **have a reproducible full-graph teacher and credible baseline results for the proposal presentation next week**. Teacher-guided edge scoring and distillation come after that presentation.
+The implementation target is now **ogbn-arxiv only**. Cora has served its purpose as an early pipeline check and is not part of the remaining experiment matrix. Finish the pruning, distillation, and profiling code first; then prepare the ARC/Slurm launch scripts; only after that should we submit additional ogbn-arxiv experiments.
+
+**Current execution rule:** do not launch or spend time on toy-graph verification during the coding phase. Complete the production code paths first, prepare the ARC experiment scripts afterward, and then validate the complete pipeline with an initial ogbn-arxiv job before launching the full grid.
 
 ## What “full graph” means
 
@@ -12,10 +14,10 @@ The teacher receives the benchmark's original node features and graph connectivi
 
 Record the exact graph preparation choices (directed versus undirected edges, self-loops, duplicate edges, and normalization) so that later sparse-graph comparisons use the same conventions.
 
-## Datasets and first model
+## Dataset and model scope
 
-- **Cora:** Small implementation check. Use its standard split and record which version/source supplies that split.
-- **ogbn-arxiv:** Main benchmark. Use the official OGB split and evaluator, with accuracy as the primary quality metric.
+- **Cora:** Historical implementation check only. Do not include it in new experiments or the final comparison grid.
+- **ogbn-arxiv:** The sole experimental benchmark. Use the official OGB split and evaluator, with accuracy as the primary quality metric.
 - **Teacher:** Start with a two-layer GCN on the unpruned graph. Fix and record hidden width, dropout, optimizer, learning rate, weight decay, training epochs, early-stopping rule, and random seeds. Add a two-layer GraphSAGE teacher only if the GCN results and baseline measurements are ready.
 
 ## Checkpoints before the proposal presentation
@@ -53,28 +55,100 @@ Record the exact graph preparation choices (directed versus undirected edges, se
 
 **Done when:** Every number on the slides can be traced to a saved run and configuration.
 
-## Later project checkpoints
+## Current status
 
-1. Implement teacher-guided edge scoring with a precisely defined score, edge budget, and graph-preparation policy.
-2. Compare random, degree-based, feature-similarity, and teacher-guided pruning at matched retained-edge counts.
-3. Train sparse-graph students with and without distillation so its contribution can be measured separately.
-4. Repeat key runs across seeds and edge budgets; report accuracy, inference latency, peak memory, and the one-time cost of scoring edges.
-5. Analyze when the scoring cost is recovered by repeated inference, and write the final report with limitations.
+- Completed on ogbn-arxiv: unpruned, random 40% removal, and degree-based 40% removal, each with seeds 0, 1, and 2.
+- Coding complete, pending ARC execution: feature-similarity pruning, teacher-gradient edge scoring, reusable sparse-graph artifacts, controlled CE/KD student training, and dedicated inference profiling.
+- ARC/Slurm workflow prepared: standard pruning grid, teacher scoring, paired CE/KD students, inference profiling, and dependency-aware submission.
+- Final hardware fixed to NVIDIA A30 on `gpu_partners` / `short_gpu`, matching the existing nine ogbn-arxiv baseline runs. A live A30 allocation check completed successfully on November 9, 2026.
+- Next task: perform the final implementation and protocol review before any ARC submission.
+- Deferred until the ARC workflow and final implementation review are complete: all new ogbn-arxiv training and profiling runs.
+
+## Next implementation checkpoints
+
+Complete these in order. Method implementation comes first; ARC scripts and experiment execution come afterward.
+
+### 1. Complete and integrate feature-similarity pruning — coded
+
+- Add `feature` as a supported method in `scripts/train_ogbn_arxiv.py`.
+- Pass `data.x` into the selector and retain exactly the same connection budget as random and degree pruning.
+- Record the selector name, retained connection count, requested/actual removal fraction, and feature-scoring time in the run configuration.
+
+**Done when:** the production training entry point contains the complete feature-similarity path and required metadata fields. Runtime experiment validation is deferred to the ARC phase.
+
+### 2. Implement teacher-guided edge scoring — coded
+
+- Load the saved full-graph teacher and keep its parameters fixed.
+- Define one gate per graph connection and compute the teacher-loss gradient with respect to the gates.
+- Convert directional values into one deterministic score per undirected connection.
+- Select an exact connection budget and save the selected sparse graph for reuse.
+- Record edge-scoring wall time and peak memory separately from student training.
+
+**Done when:** the production code can compute scores, select an exact undirected connection budget, and save the selected graph and scoring metadata for reuse. Runtime validation is deferred to the ARC phase.
+
+### 3. Implement controlled student training with and without KD — coded
+
+- Train the same student on the same saved sparse graph under CE-only and CE+KD conditions.
+- Expose and record KD weight `alpha`, temperature `T`, student width, seed, and teacher checkpoint.
+- Keep graph, architecture, optimizer, seed, early stopping, and training budget identical within each CE/KD pair.
+
+**Done when:** both loss modes run through the same entry point and differ only in the intended loss configuration.
+
+### 4. Add dedicated inference profiling — coded
+
+- Reload a saved checkpoint independently of training.
+- Measure warm full-batch inference latency with GPU synchronization and repeated trials.
+- Measure peak inference memory separately from training memory.
+- Store raw repetitions or sufficient summary statistics to audit the reported median.
+
+**Done when:** profiling produces reproducible latency and memory fields for any saved method checkpoint.
+
+### 5. Prepare the ARC experiment scripts — coded
+
+- Prepare the ARC environment, data-staging, and Slurm submission paths only after checkpoints 1-4 are coded.
+- Support random, degree, feature similarity, teacher-guided CE, and teacher-guided KD.
+- Support 20%, 40%, and 60% edge removal and seeds 0, 1, and 2.
+- Use unique run directories and prevent accidental overwriting.
+- Add a one-job validation path before any array submission.
+
+**Done when:** every planned run maps to one unique, reviewable configuration and output directory.
+
+### 6. Freeze the implementation before experiments
+
+- Review graph preprocessing, exact edge budgets, model settings, split usage, timing boundaries, and saved metadata across all methods.
+- Confirm that test labels never affect pruning, training, early stopping, or hyperparameter choices.
+- Commit or otherwise record the exact code revision used for the experiment grid.
+
+**Done when:** the comparison protocol is fixed and no method-specific training advantage remains.
+
+## Deferred ogbn-arxiv experiment checkpoints
+
+Run these only after implementation checkpoints 1-6 are complete.
+
+1. Run one seed at 40% removal for feature similarity, teacher-guided CE, and teacher-guided KD; inspect every artifact.
+2. Run all five pruned variants at 40% removal for seeds 0, 1, and 2.
+3. Expand the validated grid to 20% and 60% removal.
+4. Profile inference latency and memory for the unpruned reference and every final sparse checkpoint.
+5. Compare methods at matched retained-edge counts and report mean and variability across seeds.
+6. Calculate break-even inference counts both with teacher training included and with a pretrained teacher assumed.
+7. Produce accuracy-versus-edge-budget and accuracy-versus-latency plots, then write the final report and presentation.
 
 ## Results log template
 
 | Dataset | Method | Edges kept | Seed(s) | Val accuracy | Test accuracy | Inference latency | Peak GPU memory | Notes |
 | --- | --- | ---: | --- | ---: | ---: | ---: | ---: | --- |
-| Cora | Full-graph GCN | TBD | TBD | TBD | TBD | TBD | TBD | Pipeline check |
-| ogbn-arxiv | Full-graph GCN | TBD | TBD | TBD | TBD | TBD | TBD | Main reference |
-| ogbn-arxiv | Random pruning | TBD | TBD | TBD | TBD | TBD | TBD | Same model and protocol |
-| ogbn-arxiv | Degree-based pruning | TBD | TBD | TBD | TBD | TBD | TBD | If ready for presentation |
+| ogbn-arxiv | Full-graph GCN | Recorded in saved runs | 0, 1, 2 | Recorded | Recorded | Pending dedicated profiling | Recorded training peak | Main reference |
+| ogbn-arxiv | Random pruning, 40% removal | Recorded in saved runs | 0, 1, 2 | Recorded | Recorded | Pending dedicated profiling | Recorded training peak | Completed baseline |
+| ogbn-arxiv | Degree pruning, 40% removal | Recorded in saved runs | 0, 1, 2 | Recorded | Recorded | Pending dedicated profiling | Recorded training peak | Completed baseline |
+| ogbn-arxiv | Feature-similarity pruning | Deferred | 0, 1, 2 | Deferred | Deferred | Deferred | Deferred | Implement and validate first |
+| ogbn-arxiv | Teacher-guided, CE only | Deferred | 0, 1, 2 | Deferred | Deferred | Deferred | Deferred | Implement and validate first |
+| ogbn-arxiv | Teacher-guided, CE + KD | Deferred | 0, 1, 2 | Deferred | Deferred | Deferred | Deferred | Implement and validate first |
 
 ## Open implementation choices to settle before comparing methods
 
 - Graph library and exact GCN implementation.
 - Edge handling for ogbn-arxiv (direction, reciprocal edges, self-loops, and duplicates).
 - Whether latency measures full-batch inference or a specified batched inference workload.
-- Number of seeds and edge budgets feasible on the available hardware.
+- Final KD hyperparameters and whether the 64-width student remains an additional ablation after the controlled 128-width comparison.
 
 Source proposal: `MLG_PROJECT_PROPOSAL.pdf`.

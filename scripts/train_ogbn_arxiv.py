@@ -1,4 +1,4 @@
-"""Train an ogbn-arxiv GCN with unpruned, random, or degree-based edges."""
+"""Train an ogbn-arxiv GCN with a selected edge-pruning method."""
 
 import argparse
 import json
@@ -14,7 +14,7 @@ from torch_geometric.utils import coalesce, to_undirected
 
 from edgetrim.data import load_ogbn_arxiv
 from edgetrim.model import GCN
-from edgetrim.pruning import degree_prune_edges, random_prune_connections
+from edgetrim.pruning import degree_prune_edges, random_prune_connections, feature_similarity_prune_edges
 
 
 def parse_args():
@@ -24,9 +24,10 @@ def parse_args():
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument(
         "--method",
-        choices=("unpruned", "random", "degree"),
+        choices=("unpruned", "random", "degree", "feature", "teacher"),
         default="unpruned",
     )
+    parser.add_argument("--selected-graph", default=None)
     parser.add_argument("--removal-fraction", type=float, default=0.4)
     parser.add_argument("--hidden-channels", type=int, default=128)
     parser.add_argument("--dropout", type=float, default=0.5)
@@ -34,6 +35,10 @@ def parse_args():
     parser.add_argument("--weight-decay", type=float, default=0.0005)
     parser.add_argument("--max-epochs", type=int, default=300)
     parser.add_argument("--patience", type=int, default=50)
+    parser.add_argument("--loss-mode", choices=("ce", "kd"), default="ce")
+    parser.add_argument("--teacher-checkpoint", default=None)
+    parser.add_argument("--kd-alpha", type=float, default=0.5)
+    parser.add_argument("--temperature", type=float, default=4.0)
     return parser.parse_args()
 
 
@@ -69,15 +74,31 @@ def main():
     preprocess_started = time.perf_counter()
     edge_index = to_undirected(data.edge_index, num_nodes=data.num_nodes)
     edge_index = coalesce(edge_index, num_nodes=data.num_nodes)
+    full_edge_index = edge_index
     unpruned_edge_count = int(edge_index.size(1))
     unpruned_connection_count = count_undirected_connections(edge_index)
 
+    edge_scoring_seconds = 0.0
     if args.method == "unpruned":
         connections_to_keep = unpruned_connection_count
+    elif args.method == "teacher":
+        graph_artifact = torch.load(
+            args.selected_graph,
+            map_location="cpu",
+            weights_only=True
+        )
+
+        edge_index = graph_artifact["edge_index"]
+        graph_metadata = graph_artifact["metadata"]
+        args.removal_fraction = float(graph_metadata["removal_fraction_requested"])
+        connections_to_keep = int(graph_metadata["connections_to_keep"])
+        edge_scoring_seconds = float(graph_metadata["edge_scoring_seconds"])
     else:
         connections_to_keep = round(
             unpruned_connection_count * (1.0 - args.removal_fraction)
         )
+
+        edge_scoring_started = time.perf_counter()
         if args.method == "random":
             edge_index = random_prune_connections(
                 edge_index,
@@ -89,6 +110,14 @@ def main():
                 edge_index,
                 connections_to_keep=connections_to_keep,
             )
+        elif args.method == "feature":
+            edge_index = feature_similarity_prune_edges(
+                edge_index,
+                node_features=data.x,
+                connections_to_keep=connections_to_keep
+            )
+
+        edge_scoring_seconds = time.perf_counter() - edge_scoring_started
 
     retained_edge_count = int(edge_index.size(1))
     retained_connection_count = count_undirected_connections(edge_index)
@@ -97,6 +126,18 @@ def main():
     )
     preprocessing_seconds = time.perf_counter() - preprocess_started
 
+    if args.method == "unpruned":
+        default_run_name = f"ogbn_arxiv_unpruned_seed{args.seed}"
+    else:
+        removal_percent = round(args.removal_fraction * 100)
+        loss_suffix = f"_{args.loss_mode}" if args.method == "teacher" else ""
+        default_run_name = (
+            f"ogbn_arxiv_{args.method}{loss_suffix}_remove{removal_percent}_seed{args.seed}"
+        )
+
+    run_dir = Path(args.run_dir or f"runs/{default_run_name}")
+    run_dir.mkdir(parents=True, exist_ok=True)
+
     print(
         f"method={args.method} seed={args.seed} "
         f"connections={unpruned_connection_count}->{retained_connection_count} "
@@ -104,11 +145,57 @@ def main():
         flush=True,
     )
 
+    if args.method != "unpruned":
+        torch.save(
+            {
+                "edge_index": edge_index.cpu(),
+                "method": args.method,
+                "seed": args.seed,
+                "num_nodes": int(data.num_nodes),
+                "connections_to_keep": connections_to_keep,
+                "retained_connection_count": retained_connection_count,
+                "removal_fraction_requested": args.removal_fraction,
+                "removal_fraction_actual": actual_removal_fraction,
+                "edge_preprocessing": "make undirected, then coalesce duplicates",
+            },
+            run_dir / "selected_graph.pt"
+        )
+
     x = data.x.to(device)
     y = data.y.view(-1).long().to(device)
     edge_index = edge_index.to(device)
     split = {key: value.view(-1).long().to(device) for key, value in split.items()}
 
+    teacher_logits = None
+    if args.loss_mode == "kd":
+        teacher_checkpoint = torch.load(
+            args.teacher_checkpoint,
+            map_location=device,
+            weights_only=True
+        )
+
+        teacher_config = teacher_checkpoint["config"]
+
+        teacher  = GCN(
+            in_channels=data.num_features,
+            hidden_channels=teacher_config["hidden_channels"],
+            out_channels=int(y.max().item()) + 1,
+            dropout=teacher_config["dropout"],
+        ).to(device)
+
+        teacher.load_state_dict(
+            teacher_checkpoint["model_state_dict"]
+        )
+        teacher.eval()
+        teacher.requires_grad_(False)
+
+        full_edge_index = full_edge_index.to(device)
+
+        with torch.no_grad():
+            teacher_logits = teacher(x, full_edge_index).detach()
+        del teacher
+        torch.cuda.empty_cache()
+    
     model = GCN(
         in_channels=data.num_features,
         hidden_channels=args.hidden_channels,
@@ -133,7 +220,31 @@ def main():
         model.train()
         optimizer.zero_grad(set_to_none=True)
         logits = model(x, edge_index)
-        loss = F.cross_entropy(logits[split["train"]], y[split["train"]])
+        # loss = F.cross_entropy(logits[split["train"]], y[split["train"]])
+        student_train_logits = logits[split["train"]]
+        train_labels = y[split["train"]]
+
+        supervised_loss = F.cross_entropy(
+            student_train_logits,
+            train_labels
+        )
+
+        if args.loss_mode == "kd":
+            temperature = args.temperature
+
+            distillation_loss = F.kl_div(
+                F.log_softmax(student_train_logits / temperature, dim=-1),
+                F.softmax(teacher_logits[split["train"]] / temperature, dim=-1),
+                reduction="batchmean"
+            ) * (temperature ** 2)
+
+            loss = (
+                (1.0 - args.kd_alpha) * supervised_loss + args.kd_alpha * distillation_loss
+            )
+        else:
+            distillation_loss = None
+            loss = supervised_loss
+        
         loss.backward()
         optimizer.step()
 
@@ -176,10 +287,10 @@ def main():
             "peak_gpu_memory_bytes": int(torch.cuda.max_memory_allocated(device)),
         }
 
-    run_dir = Path(
-        args.run_dir or f"runs/ogbn_arxiv_{args.method}_seed{args.seed}"
-    )
-    run_dir.mkdir(parents=True, exist_ok=True)
+    # run_dir = Path(
+    #     args.run_dir or f"runs/ogbn_arxiv_{args.method}_seed{args.seed}"
+    # )
+    # run_dir.mkdir(parents=True, exist_ok=True)
     config = {
         "dataset": "ogbn-arxiv",
         "method": args.method,
@@ -214,6 +325,20 @@ def main():
         "gpu_capability": list(torch.cuda.get_device_capability(device)),
         "data_load_seconds": data_load_seconds,
         "preprocessing_seconds": preprocessing_seconds,
+        "edge_scoring_seconds": edge_scoring_seconds,
+        "selected_graph": args.selected_graph,
+        "loss_mode": args.loss_mode,
+        "teacher_checkpoint": args.teacher_checkpoint,
+        "kd_alpha": (
+            args.kd_alpha
+            if args.loss_mode == "kd"
+            else None
+        ),
+        "temperature": (
+            args.temperature
+            if args.loss_mode == "kd"
+            else None
+        ),
     }
 
     with (run_dir / "config.json").open("w", encoding="utf-8") as stream:

@@ -3,13 +3,13 @@
 #SBATCH --output=runs/ogbn-%A_%a.out
 #SBATCH --error=runs/ogbn-%A_%a.err
 #SBATCH --account=csc591038f26_gpu
-#SBATCH --partition=gpu
-#SBATCH --qos=gpu
-#SBATCH --gres=gpu:a100:1
+#SBATCH --partition=gpu_partners
+#SBATCH --qos=short_gpu
+#SBATCH --gres=gpu:a30:1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=32G
-#SBATCH --time=06:00:00
+#SBATCH --time=01:50:00
 #SBATCH --array=0-8%1
 
 set -euo pipefail
@@ -21,6 +21,7 @@ source "$(conda info --base)/etc/profile.d/conda.sh"
 conda activate /share/csc591038f26/kpatel53/envs/edgetrim
 export PYTHONPATH="$SLURM_SUBMIT_DIR/src${PYTHONPATH:+:$PYTHONPATH}"
 export OMP_NUM_THREADS="$SLURM_CPUS_PER_TASK"
+export TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD=1
 
 METHODS=(unpruned random degree)
 SEEDS_PER_METHOD=3

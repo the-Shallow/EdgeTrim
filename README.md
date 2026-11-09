@@ -67,9 +67,9 @@ echo "stage=$STAGE_JOB validation=$CHECK_JOB"
 sbatch --array=1-8%1 hpc/train_ogbn_arxiv.slurm
 ```
 
-The full array contains nine tasks: unpruned, random 40% removal, and degree-based 40% removal, each with seeds 0, 1, and 2. It runs one task at a time and requests one A100 from the batch-only `gpu` partition with the `gpu` QOS. Submit production work with `sbatch`, not on a login node. Monitor it with `squeue -u "$USER"` or `sq --pend` / `sq --run`; use `sj JOBID`, `sjs JOBID`, and `seff JOBID` for job details and resource use. Logs, configs, metrics, and checkpoints are written under `runs/`.
+The baseline array contains nine tasks: unpruned, random 40% removal, and degree-based 40% removal, each with seeds 0, 1, and 2. It runs one task at a time and requests one A30 from the `gpu_partners` partition with the `short_gpu` QOS. Submit production work with `sbatch`, not on a login node. Monitor it with `squeue -u "$USER"` or `sq --pend` / `sq --run`; use `sj JOBID`, `sjs JOBID`, and `seff JOBID` for job details and resource use. Logs, configs, metrics, and checkpoints are written under `runs/`.
 
-An A100 batch smoke test completed successfully on `gpu13` with PyTorch 2.15.0+cu132 and PyTorch Geometric. Interactive A100 requests may still fail with a Slurm topology error, so use the batch-only `gpu` partition for these experiments.
+All final experiments and profiling use A30 hardware so their timing and memory measurements are comparable with the existing baselines. An A30 allocation check completed successfully on `gpu05` on November 9, 2026, with CUDA 13.2. The expanded pruning, teacher-student, and profiling workflow is documented in `hpc/README.md`.
 
 ## Experiment conventions
 
