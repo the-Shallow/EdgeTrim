@@ -35,8 +35,8 @@ TEACHER_SEED=$((SLURM_ARRAY_TASK_ID % SEEDS_PER_BUDGET))
 REMOVAL_FRACTION="${REMOVAL_FRACTIONS[$BUDGET_INDEX]}"
 REMOVAL_PERCENT=$(python -c "print(round($REMOVAL_FRACTION * 100))")
 
-TEACHER_CHECKPOINT="runs/ogbn_arxiv_unpruned_seed${TEACHER_SEED}/checkpoint.pt"
-RUN_DIR="runs/teacher_graph_remove${REMOVAL_PERCENT}_teacher_seed${TEACHER_SEED}"
+TEACHER_CHECKPOINT="runs/final600/ogbn_arxiv_unpruned_seed${TEACHER_SEED}/checkpoint.pt"
+RUN_DIR="runs/final600/teacher_graph_remove${REMOVAL_PERCENT}_teacher_seed${TEACHER_SEED}"
 
 nvidia-smi
 

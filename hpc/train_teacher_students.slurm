@@ -39,9 +39,9 @@ LOSS_MODE="${LOSS_MODES[$LOSS_INDEX]}"
 REMOVAL_FRACTION="${REMOVAL_FRACTIONS[$BUDGET_INDEX]}"
 REMOVAL_PERCENT=$(python -c "print(round($REMOVAL_FRACTION * 100))")
 
-TEACHER_CHECKPOINT="runs/ogbn_arxiv_unpruned_seed${SEED}/checkpoint.pt"
-SELECTED_GRAPH="runs/teacher_graph_remove${REMOVAL_PERCENT}_teacher_seed${SEED}/selected_graph.pt"
-RUN_DIR="runs/ogbn_arxiv_teacher_${LOSS_MODE}_remove${REMOVAL_PERCENT}_seed${SEED}"
+TEACHER_CHECKPOINT="runs/final600/ogbn_arxiv_unpruned_seed${SEED}/checkpoint.pt"
+SELECTED_GRAPH="runs/final600/teacher_graph_remove${REMOVAL_PERCENT}_teacher_seed${SEED}/selected_graph.pt"
+RUN_DIR="runs/final600/ogbn_arxiv_teacher_${LOSS_MODE}_remove${REMOVAL_PERCENT}_seed${SEED}"
 
 nvidia-smi
 
@@ -53,5 +53,8 @@ python scripts/train_ogbn_arxiv.py \
     --teacher-checkpoint "$TEACHER_CHECKPOINT" \
     --kd-alpha 0.5 \
     --temperature 4.0 \
+    --hidden-channels 128 \
+    --max-epochs 600 \
+    --patience 100 \
     --seed "$SEED" \
     --run-dir "$RUN_DIR"

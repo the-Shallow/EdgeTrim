@@ -38,7 +38,7 @@ SEED=$((WITHIN_METHOD % SEEDS_PER_BUDGET))
 METHOD="${METHODS[$METHOD_INDEX]}"
 REMOVAL_FRACTION="${REMOVAL_FRACTIONS[$BUDGET_INDEX]}"
 REMOVAL_PERCENT=$(python -c "print(round($REMOVAL_FRACTION * 100))")
-RUN_DIR="runs/ogbn_arxiv_${METHOD}_remove${REMOVAL_PERCENT}_seed${SEED}"
+RUN_DIR="runs/final600/ogbn_arxiv_${METHOD}_remove${REMOVAL_PERCENT}_seed${SEED}"
 
 nvidia-smi
 
@@ -47,5 +47,7 @@ python scripts/train_ogbn_arxiv.py \
     --method "$METHOD" \
     --loss-mode ce \
     --removal-fraction "$REMOVAL_FRACTION" \
+    --max-epochs 600 \
+    --patience 100 \
     --seed "$SEED" \
     --run-dir "$RUN_DIR"

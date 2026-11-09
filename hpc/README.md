@@ -7,14 +7,16 @@ All final timing and memory measurements use the same hardware protocol as the e
 ## Job files
 
 - `stage_ogbn_arxiv.slurm`: stage the dataset through the transfer partition.
-- `score_teacher_edges.slurm`: create nine teacher-selected graphs for three budgets and three teacher seeds.
-- `train_pruned_grid.slurm`: train random, degree, and feature baselines for three budgets and three seeds (27 jobs).
-- `train_teacher_students.slurm`: train paired CE and KD students on the nine teacher-selected graphs (18 jobs).
+- `train_final_teachers.slurm`: retrain the three width-128 full-graph teachers with 600 maximum epochs and patience 100.
+- `score_teacher_edges.slurm`: create nine teacher-selected graphs from the final long-horizon teachers.
+- `train_pruned_grid.slurm`: train random, degree, and feature baselines for three budgets and three seeds with the final long-horizon protocol (27 jobs).
+- `train_teacher_students.slurm`: train paired width-128 CE and KD students on the nine teacher-selected graphs with the final long-horizon protocol (18 jobs).
+- `train_small_student_ablation.slurm`: train the focused seed-0 width-64 controls at 40% removal: unpruned CE, teacher-selected CE, and teacher-selected KD.
 - `train_teacher_students_long600.slurm`: run the two-task, seed-0, 40%-removal CE/KD sensitivity check with 600 maximum epochs and patience 100. It writes to `_long600` directories and does not replace the validated 300-epoch runs.
-- `profile_grid.slurm`: profile the three unpruned checkpoints and all 45 pruned checkpoints (48 jobs).
+- `profile_grid.slurm`: profile 51 final checkpoints: three width-128 unpruned models, 45 width-128 pruned models, and the three width-64 ablation models.
 - `submit_full_grid.sh`: submit the grids with the required dependencies.
 
-The array concurrency is `%1` so only one task from each array runs at a time. The standard-pruning and teacher-scoring arrays may run concurrently; teacher-student training waits for scoring, and profiling waits for all training.
+The array concurrency is `%1` so only one task from each array runs at a time. Final teachers and standard pruning may run concurrently. Teacher scoring waits for final teachers; both student arrays wait for scoring; profiling waits for every training array.
 
 ## Initial validation
 

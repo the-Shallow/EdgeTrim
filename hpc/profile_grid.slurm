@@ -10,7 +10,7 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=32G
 #SBATCH --time=01:00:00
-#SBATCH --array=0-47%1
+#SBATCH --array=0-50%1
 
 set -euo pipefail
 
@@ -30,8 +30,8 @@ VARIANTS=(random degree feature teacher_ce teacher_kd)
 
 if ((SLURM_ARRAY_TASK_ID < 3)); then
     SEED="$SLURM_ARRAY_TASK_ID"
-    RUN_DIR="runs/ogbn_arxiv_unpruned_seed${SEED}"
-else
+    RUN_DIR="runs/final600/ogbn_arxiv_unpruned_seed${SEED}"
+elif ((SLURM_ARRAY_TASK_ID < 48)); then
     OFFSET=$((SLURM_ARRAY_TASK_ID - 3))
     VARIANT_INDEX=$((OFFSET / 9))
     WITHIN_VARIANT=$((OFFSET % 9))
@@ -40,7 +40,19 @@ else
 
     VARIANT="${VARIANTS[$VARIANT_INDEX]}"
     REMOVAL_PERCENT="${REMOVAL_PERCENTS[$BUDGET_INDEX]}"
-    RUN_DIR="runs/ogbn_arxiv_${VARIANT}_remove${REMOVAL_PERCENT}_seed${SEED}"
+    RUN_DIR="runs/final600/ogbn_arxiv_${VARIANT}_remove${REMOVAL_PERCENT}_seed${SEED}"
+else
+    case "$SLURM_ARRAY_TASK_ID" in
+        48)
+            RUN_DIR="runs/final600/ogbn_arxiv_unpruned_width64_seed0"
+            ;;
+        49)
+            RUN_DIR="runs/final600/ogbn_arxiv_teacher_ce_width64_remove40_seed0"
+            ;;
+        50)
+            RUN_DIR="runs/final600/ogbn_arxiv_teacher_kd_width64_remove40_seed0"
+            ;;
+    esac
 fi
 
 nvidia-smi
