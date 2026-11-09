@@ -1,0 +1,64 @@
+Mon Nov  9 13:23:40 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 595.58.03              Driver Version: 595.58.03      CUDA Version: 13.2     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA A30                     On  |   00000000:58:00.0 Off |                    0 |
+| N/A   29C    P0             26W /  165W |       0MiB /  24576MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+{
+  "dataset": "ogbn-arxiv",
+  "method": "teacher_gradient",
+  "teacher_checkpoint": "runs/ogbn_arxiv_unpruned_seed0/checkpoint.pt",
+  "teacher_seed": 0,
+  "teacher_loss": 1.117773175239563,
+  "unpruned_connection_count": 1157799,
+  "connections_to_keep": 694679,
+  "retained_connection_count": 694679,
+  "removal_fraction_requested": 0.4,
+  "removal_fraction_actual": 0.4000003454831106,
+  "edge_scoring_seconds": 0.8668766189366579,
+  "peak_scoring_memory_bytes": 4185313792,
+  "score": "absolute gate-times-gradient",
+  "edge_preprocessing": "make undirected, then coalesce duplicates"
+}
+
+------------------------------------------------------------
+Resource usage summary:
+
+    Job ID            : 1785405
+    Job name          : edgetrim-score
+    User / Account    : kpatel53 / csc591038f26_gpu
+    Partition / QOS   : gpu_partners / short_gpu
+    Submitted         : 2026-11-09T13:15:31
+    Started           : 2026-11-09T13:23:36
+    Wait time         : 485 sec
+    Elapsed (wall)    : 00:01:24
+    Nodes             : 1 (gpu05)
+    CPUs allocated    : 4
+    Tasks             : 1
+    CPU time (total)  : 14.79 sec  (user 10.78, sys 4.02)
+    CPU efficiency    : 4.4%
+    Memory in use     : 1.25 GB  (sampled at job end; see seff for peak)
+    Memory requested  : 64G
+    GPUs requested    : 1 x a30
+
+    GPU stats:
+        [gpu05 GPU 0 ] mem 0 B, SM 0%, mem-util 0%, energy 1649 J
+    Working directory : /gpfs_common/share04/csc591038f26/kpatel53/EdgeTrim
+    Exit code         : 0:0
+
+    For final accounting (Slurm's MaxRSS, billing, etc.):  seff 1785405
+------------------------------------------------------------

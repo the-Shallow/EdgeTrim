@@ -10,6 +10,7 @@ All final timing and memory measurements use the same hardware protocol as the e
 - `score_teacher_edges.slurm`: create nine teacher-selected graphs for three budgets and three teacher seeds.
 - `train_pruned_grid.slurm`: train random, degree, and feature baselines for three budgets and three seeds (27 jobs).
 - `train_teacher_students.slurm`: train paired CE and KD students on the nine teacher-selected graphs (18 jobs).
+- `train_teacher_students_long600.slurm`: run the two-task, seed-0, 40%-removal CE/KD sensitivity check with 600 maximum epochs and patience 100. It writes to `_long600` directories and does not replace the validated 300-epoch runs.
 - `profile_grid.slurm`: profile the three unpruned checkpoints and all 45 pruned checkpoints (48 jobs).
 - `submit_full_grid.sh`: submit the grids with the required dependencies.
 
@@ -25,3 +26,7 @@ Before the full submission helper is used, submit individual array tasks with `s
 4. Profile the resulting checkpoints directly with `scripts/measure_inference.py` or the corresponding profiling tasks.
 
 After inspecting all artifacts, submit `bash hpc/submit_full_grid.sh` from the repository root.
+
+## Training-horizon sensitivity
+
+Before the full grid, submit `hpc/train_teacher_students_long600.slurm`. Task 0 is CE and task 1 is KD; both reuse the validated 40%-removal, teacher-seed-0 graph. Compare best validation accuracy and best epoch with the 300-epoch runs. If improvement occurs after epoch 300, update the main grid consistently for every pruning method. Otherwise retain the validated 300-epoch protocol.

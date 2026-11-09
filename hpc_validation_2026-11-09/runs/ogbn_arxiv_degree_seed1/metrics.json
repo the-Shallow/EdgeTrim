@@ -1,0 +1,8 @@
+{
+  "best_epoch": 285,
+  "train_accuracy": 0.6771863076060303,
+  "validation_accuracy": 0.6782442363837713,
+  "test_accuracy": 0.668271505874123,
+  "training_seconds": 12.844244350679219,
+  "peak_gpu_memory_bytes": 1969881088
+}

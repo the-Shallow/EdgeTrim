@@ -61,7 +61,11 @@ Record the exact graph preparation choices (directed versus undirected edges, se
 - Coding complete, pending ARC execution: feature-similarity pruning, teacher-gradient edge scoring, reusable sparse-graph artifacts, controlled CE/KD student training, and dedicated inference profiling.
 - ARC/Slurm workflow prepared: standard pruning grid, teacher scoring, paired CE/KD students, inference profiling, and dependency-aware submission.
 - Final hardware fixed to NVIDIA A30 on `gpu_partners` / `short_gpu`, matching the existing nine ogbn-arxiv baseline runs. A live A30 allocation check completed successfully on November 9, 2026.
-- Next task: perform the final implementation and protocol review before any ARC submission.
+- Seed-0, 40%-removal validation completed on A30 for feature pruning, teacher scoring, teacher-guided CE, teacher-guided KD, and sparse-model inference profiling. Every job completed with exit code 0. CE and KD used byte-equivalent connectivity tensors from the same teacher-selected graph.
+- Preliminary seed-0 test accuracy: feature 63.04%, teacher-guided CE 64.56%, and teacher-guided KD 63.04%. These are validation findings, not final multi-seed conclusions.
+- The copied unpruned seed-0 inference reference has median latency 18.85 ms and peak memory 2.72 GiB. The 40%-removal sparse runs have median latency about 12.62-12.68 ms and peak memory 1.81 GiB, corresponding to approximately 33% latency and 33.6% inference-memory reductions on A30.
+- A separate 600-epoch sensitivity array is prepared for teacher-guided CE and KD at 40% removal, seed 0, with patience 100. Its results determine whether the final grid retains 300 epochs or adopts a longer common training horizon.
+- Before the full grid: measure KD teacher-logit preparation cost, profile the unpruned seed-0 reference, and strengthen inference warm-up because validation timings showed an early high-latency regime.
 - Deferred until the ARC workflow and final implementation review are complete: all new ogbn-arxiv training and profiling runs.
 
 ## Next implementation checkpoints

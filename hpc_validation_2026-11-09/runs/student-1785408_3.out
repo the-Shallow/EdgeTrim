@@ -1,0 +1,358 @@
+Mon Nov  9 13:33:57 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 595.58.03              Driver Version: 595.58.03      CUDA Version: 13.2     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA A30                     On  |   00000000:58:00.0 Off |                    0 |
+| N/A   29C    P0             26W /  165W |       0MiB /  24576MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+method=teacher seed=0 connections=1157799->694679 edges=2315598->1389358
+epoch=1 loss=3.7228 valid_accuracy=0.0764
+epoch=2 loss=3.4452 valid_accuracy=0.0764
+epoch=3 loss=3.2291 valid_accuracy=0.0764
+epoch=4 loss=3.0972 valid_accuracy=0.0810
+epoch=5 loss=3.0600 valid_accuracy=0.2941
+epoch=6 loss=3.0466 valid_accuracy=0.2987
+epoch=7 loss=2.9934 valid_accuracy=0.2905
+epoch=8 loss=2.9285 valid_accuracy=0.2743
+epoch=9 loss=2.8719 valid_accuracy=0.2734
+epoch=10 loss=2.8247 valid_accuracy=0.2858
+epoch=11 loss=2.7754 valid_accuracy=0.2999
+epoch=12 loss=2.7237 valid_accuracy=0.3135
+epoch=13 loss=2.6660 valid_accuracy=0.3284
+epoch=14 loss=2.6091 valid_accuracy=0.3411
+epoch=15 loss=2.5507 valid_accuracy=0.3546
+epoch=16 loss=2.4930 valid_accuracy=0.3680
+epoch=17 loss=2.4410 valid_accuracy=0.3851
+epoch=18 loss=2.3859 valid_accuracy=0.4095
+epoch=19 loss=2.3339 valid_accuracy=0.4354
+epoch=20 loss=2.2875 valid_accuracy=0.4501
+epoch=21 loss=2.2392 valid_accuracy=0.4553
+epoch=22 loss=2.1886 valid_accuracy=0.4591
+epoch=23 loss=2.1412 valid_accuracy=0.4650
+epoch=24 loss=2.1002 valid_accuracy=0.4747
+epoch=25 loss=2.0595 valid_accuracy=0.4901
+epoch=26 loss=2.0263 valid_accuracy=0.5013
+epoch=27 loss=1.9882 valid_accuracy=0.5092
+epoch=28 loss=1.9516 valid_accuracy=0.5146
+epoch=29 loss=1.9170 valid_accuracy=0.5188
+epoch=30 loss=1.8835 valid_accuracy=0.5258
+epoch=31 loss=1.8534 valid_accuracy=0.5294
+epoch=32 loss=1.8233 valid_accuracy=0.5342
+epoch=33 loss=1.7970 valid_accuracy=0.5427
+epoch=34 loss=1.7664 valid_accuracy=0.5536
+epoch=35 loss=1.7426 valid_accuracy=0.5594
+epoch=36 loss=1.7187 valid_accuracy=0.5610
+epoch=37 loss=1.6929 valid_accuracy=0.5605
+epoch=38 loss=1.6716 valid_accuracy=0.5646
+epoch=39 loss=1.6491 valid_accuracy=0.5731
+epoch=40 loss=1.6270 valid_accuracy=0.5788
+epoch=41 loss=1.6128 valid_accuracy=0.5812
+epoch=42 loss=1.5903 valid_accuracy=0.5831
+epoch=43 loss=1.5725 valid_accuracy=0.5871
+epoch=44 loss=1.5575 valid_accuracy=0.5913
+epoch=45 loss=1.5393 valid_accuracy=0.5915
+epoch=46 loss=1.5261 valid_accuracy=0.5930
+epoch=47 loss=1.5109 valid_accuracy=0.5982
+epoch=48 loss=1.4982 valid_accuracy=0.6005
+epoch=49 loss=1.4866 valid_accuracy=0.6003
+epoch=50 loss=1.4753 valid_accuracy=0.6036
+epoch=51 loss=1.4641 valid_accuracy=0.6087
+epoch=52 loss=1.4508 valid_accuracy=0.6093
+epoch=53 loss=1.4448 valid_accuracy=0.6081
+epoch=54 loss=1.4340 valid_accuracy=0.6111
+epoch=55 loss=1.4227 valid_accuracy=0.6131
+epoch=56 loss=1.4177 valid_accuracy=0.6131
+epoch=57 loss=1.4070 valid_accuracy=0.6159
+epoch=58 loss=1.4032 valid_accuracy=0.6175
+epoch=59 loss=1.3923 valid_accuracy=0.6177
+epoch=60 loss=1.3845 valid_accuracy=0.6184
+epoch=61 loss=1.3796 valid_accuracy=0.6214
+epoch=62 loss=1.3747 valid_accuracy=0.6226
+epoch=63 loss=1.3664 valid_accuracy=0.6222
+epoch=64 loss=1.3628 valid_accuracy=0.6247
+epoch=65 loss=1.3576 valid_accuracy=0.6262
+epoch=66 loss=1.3536 valid_accuracy=0.6248
+epoch=67 loss=1.3470 valid_accuracy=0.6276
+epoch=68 loss=1.3436 valid_accuracy=0.6289
+epoch=69 loss=1.3421 valid_accuracy=0.6287
+epoch=70 loss=1.3329 valid_accuracy=0.6305
+epoch=71 loss=1.3300 valid_accuracy=0.6320
+epoch=72 loss=1.3274 valid_accuracy=0.6320
+epoch=73 loss=1.3224 valid_accuracy=0.6321
+epoch=74 loss=1.3206 valid_accuracy=0.6333
+epoch=75 loss=1.3160 valid_accuracy=0.6349
+epoch=76 loss=1.3163 valid_accuracy=0.6378
+epoch=77 loss=1.3077 valid_accuracy=0.6357
+epoch=78 loss=1.3071 valid_accuracy=0.6355
+epoch=79 loss=1.3064 valid_accuracy=0.6392
+epoch=80 loss=1.2997 valid_accuracy=0.6389
+epoch=81 loss=1.2962 valid_accuracy=0.6389
+epoch=82 loss=1.2962 valid_accuracy=0.6403
+epoch=83 loss=1.2945 valid_accuracy=0.6401
+epoch=84 loss=1.2907 valid_accuracy=0.6385
+epoch=85 loss=1.2902 valid_accuracy=0.6400
+epoch=86 loss=1.2891 valid_accuracy=0.6431
+epoch=87 loss=1.2831 valid_accuracy=0.6398
+epoch=88 loss=1.2813 valid_accuracy=0.6414
+epoch=89 loss=1.2802 valid_accuracy=0.6435
+epoch=90 loss=1.2743 valid_accuracy=0.6405
+epoch=91 loss=1.2748 valid_accuracy=0.6434
+epoch=92 loss=1.2738 valid_accuracy=0.6460
+epoch=93 loss=1.2703 valid_accuracy=0.6406
+epoch=94 loss=1.2743 valid_accuracy=0.6439
+epoch=95 loss=1.2681 valid_accuracy=0.6480
+epoch=96 loss=1.2659 valid_accuracy=0.6438
+epoch=97 loss=1.2682 valid_accuracy=0.6431
+epoch=98 loss=1.2610 valid_accuracy=0.6474
+epoch=99 loss=1.2624 valid_accuracy=0.6452
+epoch=100 loss=1.2617 valid_accuracy=0.6451
+epoch=101 loss=1.2575 valid_accuracy=0.6464
+epoch=102 loss=1.2571 valid_accuracy=0.6464
+epoch=103 loss=1.2567 valid_accuracy=0.6477
+epoch=104 loss=1.2573 valid_accuracy=0.6482
+epoch=105 loss=1.2536 valid_accuracy=0.6470
+epoch=106 loss=1.2558 valid_accuracy=0.6473
+epoch=107 loss=1.2511 valid_accuracy=0.6489
+epoch=108 loss=1.2511 valid_accuracy=0.6503
+epoch=109 loss=1.2485 valid_accuracy=0.6491
+epoch=110 loss=1.2491 valid_accuracy=0.6471
+epoch=111 loss=1.2460 valid_accuracy=0.6511
+epoch=112 loss=1.2473 valid_accuracy=0.6518
+epoch=113 loss=1.2471 valid_accuracy=0.6482
+epoch=114 loss=1.2455 valid_accuracy=0.6512
+epoch=115 loss=1.2437 valid_accuracy=0.6495
+epoch=116 loss=1.2449 valid_accuracy=0.6510
+epoch=117 loss=1.2400 valid_accuracy=0.6520
+epoch=118 loss=1.2406 valid_accuracy=0.6503
+epoch=119 loss=1.2400 valid_accuracy=0.6492
+epoch=120 loss=1.2380 valid_accuracy=0.6537
+epoch=121 loss=1.2408 valid_accuracy=0.6512
+epoch=122 loss=1.2382 valid_accuracy=0.6489
+epoch=123 loss=1.2362 valid_accuracy=0.6526
+epoch=124 loss=1.2344 valid_accuracy=0.6530
+epoch=125 loss=1.2347 valid_accuracy=0.6516
+epoch=126 loss=1.2333 valid_accuracy=0.6536
+epoch=127 loss=1.2363 valid_accuracy=0.6535
+epoch=128 loss=1.2386 valid_accuracy=0.6531
+epoch=129 loss=1.2324 valid_accuracy=0.6517
+epoch=130 loss=1.2318 valid_accuracy=0.6526
+epoch=131 loss=1.2319 valid_accuracy=0.6533
+epoch=132 loss=1.2308 valid_accuracy=0.6536
+epoch=133 loss=1.2292 valid_accuracy=0.6541
+epoch=134 loss=1.2277 valid_accuracy=0.6528
+epoch=135 loss=1.2295 valid_accuracy=0.6539
+epoch=136 loss=1.2298 valid_accuracy=0.6548
+epoch=137 loss=1.2292 valid_accuracy=0.6528
+epoch=138 loss=1.2256 valid_accuracy=0.6536
+epoch=139 loss=1.2248 valid_accuracy=0.6541
+epoch=140 loss=1.2264 valid_accuracy=0.6552
+epoch=141 loss=1.2266 valid_accuracy=0.6550
+epoch=142 loss=1.2262 valid_accuracy=0.6559
+epoch=143 loss=1.2258 valid_accuracy=0.6535
+epoch=144 loss=1.2243 valid_accuracy=0.6549
+epoch=145 loss=1.2245 valid_accuracy=0.6569
+epoch=146 loss=1.2221 valid_accuracy=0.6538
+epoch=147 loss=1.2230 valid_accuracy=0.6553
+epoch=148 loss=1.2227 valid_accuracy=0.6563
+epoch=149 loss=1.2206 valid_accuracy=0.6557
+epoch=150 loss=1.2214 valid_accuracy=0.6557
+epoch=151 loss=1.2182 valid_accuracy=0.6540
+epoch=152 loss=1.2221 valid_accuracy=0.6567
+epoch=153 loss=1.2209 valid_accuracy=0.6578
+epoch=154 loss=1.2195 valid_accuracy=0.6534
+epoch=155 loss=1.2193 valid_accuracy=0.6551
+epoch=156 loss=1.2176 valid_accuracy=0.6567
+epoch=157 loss=1.2153 valid_accuracy=0.6558
+epoch=158 loss=1.2173 valid_accuracy=0.6560
+epoch=159 loss=1.2202 valid_accuracy=0.6576
+epoch=160 loss=1.2151 valid_accuracy=0.6571
+epoch=161 loss=1.2171 valid_accuracy=0.6559
+epoch=162 loss=1.2146 valid_accuracy=0.6575
+epoch=163 loss=1.2173 valid_accuracy=0.6573
+epoch=164 loss=1.2155 valid_accuracy=0.6557
+epoch=165 loss=1.2162 valid_accuracy=0.6573
+epoch=166 loss=1.2123 valid_accuracy=0.6554
+epoch=167 loss=1.2142 valid_accuracy=0.6562
+epoch=168 loss=1.2121 valid_accuracy=0.6580
+epoch=169 loss=1.2134 valid_accuracy=0.6575
+epoch=170 loss=1.2113 valid_accuracy=0.6547
+epoch=171 loss=1.2109 valid_accuracy=0.6579
+epoch=172 loss=1.2117 valid_accuracy=0.6577
+epoch=173 loss=1.2121 valid_accuracy=0.6566
+epoch=174 loss=1.2131 valid_accuracy=0.6566
+epoch=175 loss=1.2097 valid_accuracy=0.6574
+epoch=176 loss=1.2127 valid_accuracy=0.6598
+epoch=177 loss=1.2125 valid_accuracy=0.6559
+epoch=178 loss=1.2128 valid_accuracy=0.6576
+epoch=179 loss=1.2123 valid_accuracy=0.6583
+epoch=180 loss=1.2119 valid_accuracy=0.6550
+epoch=181 loss=1.2114 valid_accuracy=0.6572
+epoch=182 loss=1.2102 valid_accuracy=0.6549
+epoch=183 loss=1.2114 valid_accuracy=0.6581
+epoch=184 loss=1.2094 valid_accuracy=0.6583
+epoch=185 loss=1.2105 valid_accuracy=0.6536
+epoch=186 loss=1.2115 valid_accuracy=0.6589
+epoch=187 loss=1.2068 valid_accuracy=0.6565
+epoch=188 loss=1.2075 valid_accuracy=0.6567
+epoch=189 loss=1.2082 valid_accuracy=0.6594
+epoch=190 loss=1.2086 valid_accuracy=0.6570
+epoch=191 loss=1.2057 valid_accuracy=0.6567
+epoch=192 loss=1.2084 valid_accuracy=0.6571
+epoch=193 loss=1.2043 valid_accuracy=0.6593
+epoch=194 loss=1.2078 valid_accuracy=0.6583
+epoch=195 loss=1.2090 valid_accuracy=0.6568
+epoch=196 loss=1.2056 valid_accuracy=0.6601
+epoch=197 loss=1.2047 valid_accuracy=0.6585
+epoch=198 loss=1.2045 valid_accuracy=0.6567
+epoch=199 loss=1.2073 valid_accuracy=0.6596
+epoch=200 loss=1.2011 valid_accuracy=0.6574
+epoch=201 loss=1.2011 valid_accuracy=0.6574
+epoch=202 loss=1.2045 valid_accuracy=0.6584
+epoch=203 loss=1.2022 valid_accuracy=0.6589
+epoch=204 loss=1.2017 valid_accuracy=0.6598
+epoch=205 loss=1.2028 valid_accuracy=0.6591
+epoch=206 loss=1.2045 valid_accuracy=0.6585
+epoch=207 loss=1.2012 valid_accuracy=0.6596
+epoch=208 loss=1.2054 valid_accuracy=0.6586
+epoch=209 loss=1.2013 valid_accuracy=0.6588
+epoch=210 loss=1.2029 valid_accuracy=0.6584
+epoch=211 loss=1.2021 valid_accuracy=0.6595
+epoch=212 loss=1.2038 valid_accuracy=0.6598
+epoch=213 loss=1.1992 valid_accuracy=0.6587
+epoch=214 loss=1.1987 valid_accuracy=0.6574
+epoch=215 loss=1.2022 valid_accuracy=0.6603
+epoch=216 loss=1.2028 valid_accuracy=0.6583
+epoch=217 loss=1.2000 valid_accuracy=0.6595
+epoch=218 loss=1.2002 valid_accuracy=0.6591
+epoch=219 loss=1.1989 valid_accuracy=0.6606
+epoch=220 loss=1.2033 valid_accuracy=0.6592
+epoch=221 loss=1.1983 valid_accuracy=0.6605
+epoch=222 loss=1.1998 valid_accuracy=0.6603
+epoch=223 loss=1.2000 valid_accuracy=0.6582
+epoch=224 loss=1.2008 valid_accuracy=0.6610
+epoch=225 loss=1.1996 valid_accuracy=0.6580
+epoch=226 loss=1.1992 valid_accuracy=0.6587
+epoch=227 loss=1.1953 valid_accuracy=0.6606
+epoch=228 loss=1.1997 valid_accuracy=0.6565
+epoch=229 loss=1.2002 valid_accuracy=0.6598
+epoch=230 loss=1.1981 valid_accuracy=0.6596
+epoch=231 loss=1.1999 valid_accuracy=0.6598
+epoch=232 loss=1.1994 valid_accuracy=0.6603
+epoch=233 loss=1.1984 valid_accuracy=0.6589
+epoch=234 loss=1.1972 valid_accuracy=0.6607
+epoch=235 loss=1.1963 valid_accuracy=0.6602
+epoch=236 loss=1.1967 valid_accuracy=0.6583
+epoch=237 loss=1.1969 valid_accuracy=0.6593
+epoch=238 loss=1.1942 valid_accuracy=0.6609
+epoch=239 loss=1.1970 valid_accuracy=0.6600
+epoch=240 loss=1.1982 valid_accuracy=0.6609
+epoch=241 loss=1.1967 valid_accuracy=0.6589
+epoch=242 loss=1.1959 valid_accuracy=0.6590
+epoch=243 loss=1.1952 valid_accuracy=0.6606
+epoch=244 loss=1.1939 valid_accuracy=0.6591
+epoch=245 loss=1.1963 valid_accuracy=0.6624
+epoch=246 loss=1.1953 valid_accuracy=0.6593
+epoch=247 loss=1.1947 valid_accuracy=0.6614
+epoch=248 loss=1.1947 valid_accuracy=0.6607
+epoch=249 loss=1.1931 valid_accuracy=0.6606
+epoch=250 loss=1.1926 valid_accuracy=0.6608
+epoch=251 loss=1.1905 valid_accuracy=0.6617
+epoch=252 loss=1.1922 valid_accuracy=0.6602
+epoch=253 loss=1.1923 valid_accuracy=0.6608
+epoch=254 loss=1.1920 valid_accuracy=0.6615
+epoch=255 loss=1.1943 valid_accuracy=0.6593
+epoch=256 loss=1.1933 valid_accuracy=0.6614
+epoch=257 loss=1.1945 valid_accuracy=0.6596
+epoch=258 loss=1.1915 valid_accuracy=0.6621
+epoch=259 loss=1.1948 valid_accuracy=0.6591
+epoch=260 loss=1.1944 valid_accuracy=0.6608
+epoch=261 loss=1.1918 valid_accuracy=0.6615
+epoch=262 loss=1.1899 valid_accuracy=0.6599
+epoch=263 loss=1.1897 valid_accuracy=0.6617
+epoch=264 loss=1.1892 valid_accuracy=0.6597
+epoch=265 loss=1.1907 valid_accuracy=0.6588
+epoch=266 loss=1.1947 valid_accuracy=0.6614
+epoch=267 loss=1.1903 valid_accuracy=0.6616
+epoch=268 loss=1.1911 valid_accuracy=0.6592
+epoch=269 loss=1.1897 valid_accuracy=0.6606
+epoch=270 loss=1.1930 valid_accuracy=0.6637
+epoch=271 loss=1.1915 valid_accuracy=0.6585
+epoch=272 loss=1.1893 valid_accuracy=0.6589
+epoch=273 loss=1.1913 valid_accuracy=0.6621
+epoch=274 loss=1.1853 valid_accuracy=0.6588
+epoch=275 loss=1.1880 valid_accuracy=0.6627
+epoch=276 loss=1.1868 valid_accuracy=0.6606
+epoch=277 loss=1.1881 valid_accuracy=0.6610
+epoch=278 loss=1.1885 valid_accuracy=0.6623
+epoch=279 loss=1.1887 valid_accuracy=0.6616
+epoch=280 loss=1.1882 valid_accuracy=0.6599
+epoch=281 loss=1.1884 valid_accuracy=0.6607
+epoch=282 loss=1.1885 valid_accuracy=0.6609
+epoch=283 loss=1.1885 valid_accuracy=0.6617
+epoch=284 loss=1.1870 valid_accuracy=0.6589
+epoch=285 loss=1.1889 valid_accuracy=0.6630
+epoch=286 loss=1.1870 valid_accuracy=0.6603
+epoch=287 loss=1.1872 valid_accuracy=0.6607
+epoch=288 loss=1.1883 valid_accuracy=0.6626
+epoch=289 loss=1.1907 valid_accuracy=0.6587
+epoch=290 loss=1.1898 valid_accuracy=0.6615
+epoch=291 loss=1.1871 valid_accuracy=0.6620
+epoch=292 loss=1.1893 valid_accuracy=0.6606
+epoch=293 loss=1.1872 valid_accuracy=0.6627
+epoch=294 loss=1.1875 valid_accuracy=0.6605
+epoch=295 loss=1.1865 valid_accuracy=0.6615
+epoch=296 loss=1.1839 valid_accuracy=0.6608
+epoch=297 loss=1.1856 valid_accuracy=0.6631
+epoch=298 loss=1.1868 valid_accuracy=0.6612
+epoch=299 loss=1.1870 valid_accuracy=0.6612
+epoch=300 loss=1.1871 valid_accuracy=0.6613
+run_dir=runs/ogbn_arxiv_teacher_ce_remove40_seed0
+{
+  "best_epoch": 270,
+  "train_accuracy": 0.6755478826931747,
+  "validation_accuracy": 0.6637135474344776,
+  "test_accuracy": 0.6455568586301257,
+  "training_seconds": 13.115848268847913,
+  "peak_gpu_memory_bytes": 1985868288
+}
+
+------------------------------------------------------------
+Resource usage summary:
+
+    Job ID            : 1785408
+    Job name          : edgetrim-student
+    User / Account    : kpatel53 / csc591038f26_gpu
+    Partition / QOS   : gpu_partners / short_gpu
+    Submitted         : 2026-11-09T13:15:36
+    Started           : 2026-11-09T13:33:52
+    Wait time         : 1096 sec
+    Elapsed (wall)    : 00:01:56
+    Nodes             : 1 (gpu05)
+    CPUs allocated    : 4
+    Tasks             : 1
+    CPU time (total)  : 28.09 sec  (user 23.56, sys 4.54)
+    CPU efficiency    : 6.1%
+    Memory in use     : 1.39 GB  (sampled at job end; see seff for peak)
+    Memory requested  : 32G
+    GPUs requested    : 1 x a30
+
+    GPU stats:
+        [gpu05 GPU 0 ] mem 2.85 GB, SM 0%, mem-util 0%, energy 2431 J
+    Working directory : /gpfs_common/share04/csc591038f26/kpatel53/EdgeTrim
+    Exit code         : 0:0
+
+    For final accounting (Slurm's MaxRSS, billing, etc.):  seff 1785408
+------------------------------------------------------------

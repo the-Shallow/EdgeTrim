@@ -1,0 +1,16 @@
+{
+  "dataset": "ogbn-arxiv",
+  "method": "teacher_gradient",
+  "teacher_checkpoint": "runs/ogbn_arxiv_unpruned_seed0/checkpoint.pt",
+  "teacher_seed": 0,
+  "teacher_loss": 1.117773175239563,
+  "unpruned_connection_count": 1157799,
+  "connections_to_keep": 694679,
+  "retained_connection_count": 694679,
+  "removal_fraction_requested": 0.4,
+  "removal_fraction_actual": 0.4000003454831106,
+  "edge_scoring_seconds": 0.8668766189366579,
+  "peak_scoring_memory_bytes": 4185313792,
+  "score": "absolute gate-times-gradient",
+  "edge_preprocessing": "make undirected, then coalesce duplicates"
+}

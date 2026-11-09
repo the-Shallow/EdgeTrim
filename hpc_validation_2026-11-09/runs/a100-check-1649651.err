@@ -1,0 +1,2 @@
+/share/csc591038f26/kpatel53/envs/edgetrim/lib/python3.11/site-packages/torch/jit/_script.py:1491: FutureWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
