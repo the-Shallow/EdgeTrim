@@ -13,7 +13,7 @@ from ogb.nodeproppred import Evaluator
 from torch_geometric.utils import coalesce, to_undirected
 
 from edgetrim.data import load_ogbn_arxiv
-from edgetrim.model import GCN
+from edgetrim.model import build_model, build_model_from_config
 from edgetrim.pruning import degree_prune_edges, random_prune_connections, feature_similarity_prune_edges
 
 
@@ -30,6 +30,12 @@ def parse_args():
     parser.add_argument("--selected-graph", default=None)
     parser.add_argument("--removal-fraction", type=float, default=0.4)
     parser.add_argument("--hidden-channels", type=int, default=128)
+    parser.add_argument(
+        "--model-architecture",
+        choices=("gcn_2layer", "ogb_gcn"),
+        default="gcn_2layer",
+    )
+    parser.add_argument("--num-layers", type=int, default=2)
     parser.add_argument("--dropout", type=float, default=0.5)
     parser.add_argument("--learning-rate", type=float, default=0.01)
     parser.add_argument("--weight-decay", type=float, default=0.0005)
@@ -176,11 +182,10 @@ def main():
 
         teacher_config = teacher_checkpoint["config"]
 
-        teacher  = GCN(
+        teacher = build_model_from_config(
+            teacher_config,
             in_channels=data.num_features,
-            hidden_channels=teacher_config["hidden_channels"],
             out_channels=int(y.max().item()) + 1,
-            dropout=teacher_config["dropout"],
         ).to(device)
 
         teacher.load_state_dict(
@@ -196,11 +201,13 @@ def main():
         del teacher
         torch.cuda.empty_cache()
     
-    model = GCN(
+    model = build_model(
+        architecture=args.model_architecture,
         in_channels=data.num_features,
         hidden_channels=args.hidden_channels,
         out_channels=int(y.max().item()) + 1,
         dropout=args.dropout,
+        num_layers=args.num_layers,
     ).to(device)
     optimizer = torch.optim.Adam(
         model.parameters(),
@@ -312,7 +319,18 @@ def main():
         "num_classes": int(y.max().item()) + 1,
         "split_sizes": {key: int(value.numel()) for key, value in split.items()},
         "seed": args.seed,
-        "model": "two-layer PyG GCN",
+        "model": (
+            "OGB-style PyG GCN with BatchNorm"
+            if args.model_architecture == "ogb_gcn"
+            else "two-layer PyG GCN"
+        ),
+        "model_architecture": args.model_architecture,
+        "num_layers": (
+            args.num_layers
+            if args.model_architecture == "ogb_gcn"
+            else 2
+        ),
+        "batch_norm": args.model_architecture == "ogb_gcn",
         "hidden_channels": args.hidden_channels,
         "dropout": args.dropout,
         "learning_rate": args.learning_rate,

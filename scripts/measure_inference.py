@@ -9,7 +9,7 @@ import torch
 from ogb.nodeproppred import Evaluator
 from torch_geometric.utils import coalesce, to_undirected
 from edgetrim.data import load_ogbn_arxiv
-from edgetrim.model import GCN
+from edgetrim.model import build_model_from_config
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -62,11 +62,10 @@ def main():
     edge_index = edge_index.to(device)
     test_indices = split["test"].view(-1).long().to(device)
 
-    model = GCN(
+    model = build_model_from_config(
+        config,
         in_channels=data.num_features,
-        hidden_channels=config["hidden_channels"],
         out_channels=int(y.max().item()) + 1,
-        dropout=config["dropout"],
     ).to(device)
 
     model.load_state_dict(

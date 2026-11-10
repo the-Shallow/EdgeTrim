@@ -7,7 +7,7 @@ import torch
 from torch_geometric.utils import coalesce, to_undirected
 
 from edgetrim.data import load_ogbn_arxiv
-from edgetrim.model import GCN
+from edgetrim.model import build_model_from_config
 from edgetrim.pruning import (
     select_connections_by_score,
     teacher_gradient_connection_scores
@@ -59,11 +59,10 @@ def main():
 
     teacher_config = checkpoint["config"]
 
-    teacher = GCN(
+    teacher = build_model_from_config(
+        teacher_config,
         in_channels=data.num_features,
-        hidden_channels=teacher_config["hidden_channels"],
         out_channels=int(labels.max().item()) + 1,
-        dropout=teacher_config["dropout"],
     ).to(device)
 
     teacher.load_state_dict(

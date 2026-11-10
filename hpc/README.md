@@ -8,6 +8,7 @@ All final timing and memory measurements use the same hardware protocol as the e
 
 - `stage_ogbn_arxiv.slurm`: stage the dataset through the transfer partition.
 - `train_final_teachers.slurm`: retrain the three width-128 full-graph teachers with 600 maximum epochs and patience 100.
+- `train_strong_teachers.slurm`: train the three OGB-style teachers (3 layers, width 256, BatchNorm) for 500 epochs without effective early stopping. Outputs are isolated under `runs/strong_teacher` and do not replace the completed final-grid teachers.
 - `score_teacher_edges.slurm`: create nine teacher-selected graphs from the final long-horizon teachers.
 - `train_pruned_grid.slurm`: train random, degree, and feature baselines for three budgets and three seeds with the final long-horizon protocol (27 jobs).
 - `train_teacher_students.slurm`: train paired width-128 CE and KD students on the nine teacher-selected graphs with the final long-horizon protocol (18 jobs).
@@ -28,6 +29,17 @@ Before the full submission helper is used, submit individual array tasks with `s
 4. Profile the resulting checkpoints directly with `scripts/measure_inference.py` or the corresponding profiling tasks.
 
 After inspecting all artifacts, submit `bash hpc/submit_full_grid.sh` from the repository root.
+
+## Strong-teacher follow-up
+
+Validate the stronger architecture with seed 0 before generating new teacher-selected graphs:
+
+```bash
+mkdir -p runs/strong_teacher
+sbatch --array=0 hpc/train_strong_teachers.slurm
+```
+
+The expected checkpoint is `runs/strong_teacher/ogbn_arxiv_ogb_gcn_seed0/checkpoint.pt`. Inspect its `config.json` and `metrics.json`; continue with seeds 1 and 2 only after confirming that the validation and test results improve materially over the completed two-layer teacher.
 
 ## Training-horizon sensitivity
 
