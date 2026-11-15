@@ -15,6 +15,8 @@ All final timing and memory measurements use the same hardware protocol as the e
 - `submit_strong_teacher_grid.sh`: verify all three strong checkpoints and submit scoring, student training, and profiling with `afterok` dependencies.
 - `train_kd_sweep40_seed0.slurm`: run the focused seed-0 KD sweep on the fixed strong-teacher 40%-removal graph for alpha in `{0.1, 0.25, 0.5, 0.75}` and temperature in `{1, 2, 4}`.
 - `submit_kd_sweep40.sh`: verify the seed-0 strong teacher and selected graph, then submit the 12-task KD sweep.
+- `train_kd_confirm40.slurm`: confirm the two seed-0 sweep finalists (`alpha=0.75, T=2` and `alpha=0.5, T=2`) on matched teachers and selected graphs for seeds 1 and 2.
+- `submit_kd_confirm40.sh`: verify the required seed-1/2 teacher and graph artifacts, then submit the four confirmation jobs.
 - `score_teacher_edges.slurm`: create nine teacher-selected graphs from the final long-horizon teachers.
 - `train_pruned_grid.slurm`: train random, degree, and feature baselines for three budgets and three seeds with the final long-horizon protocol (27 jobs).
 - `train_teacher_students.slurm`: train paired width-128 CE and KD students on the nine teacher-selected graphs with the final long-horizon protocol (18 jobs).
@@ -64,6 +66,12 @@ bash hpc/submit_kd_sweep40.sh
 ```
 
 Choose candidates using validation accuracy only. After the seed-0 sweep, confirm the best one or two configurations on seeds 1 and 2 before interpreting their test accuracy. Inference profiling is unnecessary during the sweep because every candidate has identical student architecture and graph connectivity.
+
+The seed-0 sweep selected `alpha=0.75, T=2` and `alpha=0.5, T=2` as the top two validation configurations. Confirm them with:
+
+```bash
+bash hpc/submit_kd_confirm40.sh
+```
 
 ## Training-horizon sensitivity
 
