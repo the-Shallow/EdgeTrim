@@ -13,6 +13,8 @@ All final timing and memory measurements use the same hardware protocol as the e
 - `train_strong_teacher_students.slurm`: train paired width-128 CE and KD students on the nine strong-teacher-selected graphs (18 jobs) with the final 600-epoch protocol.
 - `profile_strong_teacher_grid.slurm`: profile the three strong teachers and all 18 strong-teacher sparse students.
 - `submit_strong_teacher_grid.sh`: verify all three strong checkpoints and submit scoring, student training, and profiling with `afterok` dependencies.
+- `train_kd_sweep40_seed0.slurm`: run the focused seed-0 KD sweep on the fixed strong-teacher 40%-removal graph for alpha in `{0.1, 0.25, 0.5, 0.75}` and temperature in `{1, 2, 4}`.
+- `submit_kd_sweep40.sh`: verify the seed-0 strong teacher and selected graph, then submit the 12-task KD sweep.
 - `score_teacher_edges.slurm`: create nine teacher-selected graphs from the final long-horizon teachers.
 - `train_pruned_grid.slurm`: train random, degree, and feature baselines for three budgets and three seeds with the final long-horizon protocol (27 jobs).
 - `train_teacher_students.slurm`: train paired width-128 CE and KD students on the nine teacher-selected graphs with the final long-horizon protocol (18 jobs).
@@ -52,6 +54,16 @@ bash hpc/submit_strong_teacher_grid.sh
 ```
 
 This follow-up does not rerun random, degree, or feature pruning. Those completed teacher-independent baselines remain the comparison controls.
+
+## Focused KD hyperparameter sweep
+
+The first tuning stage holds the teacher, selected graph, student architecture, optimizer, seed, and training horizon fixed. It varies only KD alpha and temperature at 40% removal:
+
+```bash
+bash hpc/submit_kd_sweep40.sh
+```
+
+Choose candidates using validation accuracy only. After the seed-0 sweep, confirm the best one or two configurations on seeds 1 and 2 before interpreting their test accuracy. Inference profiling is unnecessary during the sweep because every candidate has identical student architecture and graph connectivity.
 
 ## Training-horizon sensitivity
 
