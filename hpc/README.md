@@ -20,6 +20,8 @@ All final timing and memory measurements use the same hardware protocol as the e
 - `train_controlled_kd_grid.slurm`: train tuned KD students on both degree- and teacher-selected graphs for three budgets and three seeds (18 jobs).
 - `profile_controlled_kd_grid.slurm`: profile all 18 controlled KD checkpoints on A30.
 - `submit_controlled_kd_grid.sh`: accept the validation-selected alpha and temperature, verify all prerequisite graphs and teachers, then submit training and profiling with dependencies.
+- `evaluate_frozen_pruned_grid.slurm`: evaluate the seed-matched, full-graph-trained two-layer checkpoints on the existing degree, random, and feature-pruned graphs at all three budgets without retraining (27 inference-only jobs).
+- `submit_frozen_pruned_grid.sh`: verify the 3 unpruned checkpoints and all 27 saved graph artifacts, then submit the frozen-weight evaluation array.
 - `score_teacher_edges.slurm`: create nine teacher-selected graphs from the final long-horizon teachers.
 - `train_pruned_grid.slurm`: train random, degree, and feature baselines for three budgets and three seeds with the final long-horizon protocol (27 jobs).
 - `train_teacher_students.slurm`: train paired width-128 CE and KD students on the nine teacher-selected graphs with the final long-horizon protocol (18 jobs).
@@ -83,6 +85,22 @@ bash hpc/submit_controlled_kd_grid.sh 0.5 2.0
 ```
 
 This produces tuned KD results on both degree- and teacher-selected graphs. Existing CE results provide the other two cells of the controlled 2-by-2 comparison. New KD metrics also record teacher-logit preparation time, preparation memory, teacher accuracy, student-teacher agreement, and KL divergence.
+
+## Frozen-weight pruning baselines
+
+The standard pruning results retrain a new model on each sparse graph. To measure the immediate effect of graph pruning alone, evaluate the already-trained full-graph checkpoints on the exact saved degree, random, and feature graphs:
+
+```bash
+bash hpc/submit_frozen_pruned_grid.sh
+```
+
+This array performs no optimization and does not regenerate any graph. For every selector, budget, and seed, it loads `runs/final600/ogbn_arxiv_unpruned_seed${seed}/checkpoint.pt` and the corresponding existing `selected_graph.pt`. Results are written below `runs/frozen_pruned_baselines`. After copying them locally, aggregate the 27 runs with:
+
+```bash
+python scripts/summarize_frozen_pruned.py \
+  --root runs/frozen_pruned_baselines \
+  --output runs/frozen_pruned_baselines/summary.json
+```
 
 ## Training-horizon sensitivity
 

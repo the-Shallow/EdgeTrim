@@ -16,6 +16,7 @@ def parse_args():
     parser.add_argument("--root", default="data/ogbn-arxiv")
     parser.add_argument("--checkpoint", required=True)
     parser.add_argument("--graph-path", default=None)
+    parser.add_argument("--evaluation-method", default=None)
     parser.add_argument("--output", default=None)
     parser.add_argument("--warmup-runs", type=int, default=10)
     parser.add_argument("--measured-runs", type=int, default=30)
@@ -35,7 +36,21 @@ def main():
 
     config = checkpoint["config"]
 
-    if config["method"] == "unpruned":
+    graph_artifact = None
+
+    # An explicitly supplied graph always overrides the graph on which the
+    # checkpoint was trained. This supports frozen-weight transfer evaluation:
+    # load a full-graph checkpoint, replace only its edge_index, and run
+    # inference without any optimizer steps.
+    if args.graph_path is not None:
+        graph_path = Path(args.graph_path)
+        graph_artifact = torch.load(
+            graph_path,
+            map_location="cpu",
+            weights_only=True,
+        )
+        edge_index = graph_artifact["edge_index"]
+    elif config["method"] == "unpruned":
         edge_index = to_undirected(
             data.edge_index,
             num_nodes=data.num_nodes,
@@ -56,6 +71,15 @@ def main():
         )
 
         edge_index = graph_artifact["edge_index"]
+
+    if args.evaluation_method is not None:
+        evaluation_method = args.evaluation_method
+    elif args.graph_path is not None and graph_artifact is not None:
+        evaluation_method = graph_artifact.get("method", config["method"])
+    else:
+        # Preserve the original profiler's method label when it evaluates a
+        # checkpoint on its own training graph.
+        evaluation_method = config["method"]
 
     x = data.x.to(device)
     y = data.y.view(-1).long().to(device)
@@ -114,7 +138,14 @@ def main():
 
     metrics = {
         "dataset": "ogbn-arxiv",
-        "method": config["method"],
+        "method": evaluation_method,
+        "checkpoint_method": config["method"],
+        "evaluation_method": evaluation_method,
+        "evaluation_protocol": (
+            "frozen_checkpoint_on_supplied_graph"
+            if args.graph_path is not None
+            else "checkpoint_on_training_graph"
+        ),
         "loss_mode": config.get("loss_mode", "ce"),
         "checkpoint": str(checkpoint_path),
         "graph_path": (
@@ -123,6 +154,30 @@ def main():
             else None
         ),
         "edge_count": int(edge_index.size(1)),
+        "retained_connection_count": (
+            int(graph_artifact["retained_connection_count"])
+            if graph_artifact is not None
+            and "retained_connection_count" in graph_artifact
+            else None
+        ),
+        "removal_fraction_requested": (
+            float(graph_artifact["removal_fraction_requested"])
+            if graph_artifact is not None
+            and "removal_fraction_requested" in graph_artifact
+            else 0.0
+        ),
+        "removal_fraction_actual": (
+            float(graph_artifact["removal_fraction_actual"])
+            if graph_artifact is not None
+            and "removal_fraction_actual" in graph_artifact
+            else 0.0
+        ),
+        "checkpoint_seed": config.get("seed"),
+        "graph_seed": (
+            graph_artifact.get("seed")
+            if graph_artifact is not None
+            else None
+        ),
         "parameter_count": sum(
             parameter.numel()
             for parameter in model.parameters()
