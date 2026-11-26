@@ -1,0 +1,12 @@
+{"schema":"openai.presentation.layout/v5","unit":"px","slide":{"id":"sl/y90nupkv","index":0,"layout":{"id":"ly/14ra9krq","name":"Blank"},"backgroundColor":"rgba(18,42,41,1)","position":{"left":0,"top":0,"width":1280,"height":720}},
+"elements":[
+{"id":"sh/wn6dc7eh","kind":"textbox","position":{"left":72,"top":54,"width":520,"height":24},"text":"EDGE TRIM  /  RESEARCH UPDATE","style":{"fontSize":14,"typeface":"Aptos","color":"#E4BD67","bold":true,"alignment":"left"},"geometry":"rect","lineWidth":0},
+{"id":"sh/547294r6","kind":"shape","position":{"left":72,"top":96,"width":1136,"height":0},"geometry":"line","lineColor":"#44605A","lineWidth":1},
+{"id":"sh/k3yl0zql","kind":"textbox","position":{"left":72,"top":164,"width":1050,"height":178},"text":"Teacher-guided graph\nsparsification and distillation","style":{"fontSize":58,"typeface":"Georgia","color":"#F4F3EB","bold":true,"alignment":"left"},"geometry":"rect","lineWidth":0},
+{"id":"sh/7qp4be9c","kind":"textbox","position":{"left":76,"top":374,"width":940,"height":60},"text":"What do our experiments say about accuracy, model size, and inference cost?","style":{"fontSize":26,"typeface":"Aptos","color":"#D8E1D9","alignment":"left"},"geometry":"rect","lineWidth":0},
+{"id":"sh/65g3298r","kind":"shape","position":{"left":72,"top":500,"width":4,"height":66},"geometry":"rect","fillColor":"#72C8BE","lineWidth":0},
+{"id":"sh/ts7md4r2","kind":"textbox","position":{"left":94,"top":500,"width":640,"height":30},"text":"Machine Learning for Graphs","style":{"fontSize":20,"typeface":"Aptos","color":"#F4F3EB","bold":true,"alignment":"left"},"geometry":"rect","lineWidth":0},
+{"id":"sh/sryl4zqx","kind":"textbox","position":{"left":94,"top":536,"width":640,"height":24},"text":"40-minute research presentation","style":{"fontSize":17,"typeface":"Aptos","color":"#AABBB2","alignment":"left"},"geometry":"rect","lineWidth":0},
+{"id":"sh/fu94fe98","kind":"shape","position":{"left":72,"top":680,"width":1136,"height":0},"geometry":"line","lineColor":"#44605A","lineWidth":1},
+{"id":"sh/utg3698n","kind":"textbox","position":{"left":72,"top":689,"width":650,"height":18},"text":"EdgeTrim-KD  |  ogbn-arxiv","style":{"fontSize":12,"typeface":"Aptos","color":"#AABBB2","alignment":"left"},"geometry":"rect","lineWidth":0}
+]}

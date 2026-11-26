@@ -85,9 +85,10 @@ def main():
     unpruned_connection_count = count_undirected_connections(edge_index)
 
     edge_scoring_seconds = 0.0
+    graph_selector = args.method
     if args.method == "unpruned":
         connections_to_keep = unpruned_connection_count
-    elif args.method == "teacher":
+    elif args.selected_graph is not None:
         graph_artifact = torch.load(
             args.selected_graph,
             map_location="cpu",
@@ -95,10 +96,16 @@ def main():
         )
 
         edge_index = graph_artifact["edge_index"]
-        graph_metadata = graph_artifact["metadata"]
+        graph_metadata = graph_artifact.get("metadata", graph_artifact)
         args.removal_fraction = float(graph_metadata["removal_fraction_requested"])
         connections_to_keep = int(graph_metadata["connections_to_keep"])
-        edge_scoring_seconds = float(graph_metadata["edge_scoring_seconds"])
+        edge_scoring_seconds = float(graph_metadata.get("edge_scoring_seconds", 0.0))
+        graph_selector = graph_metadata.get(
+            "method",
+            graph_artifact.get("method", args.method),
+        )
+    elif args.method == "teacher":
+        raise ValueError("--selected-graph is required for method=teacher")
     else:
         connections_to_keep = round(
             unpruned_connection_count * (1.0 - args.removal_fraction)
@@ -156,6 +163,7 @@ def main():
             {
                 "edge_index": edge_index.cpu(),
                 "method": args.method,
+                "graph_selector": graph_selector,
                 "seed": args.seed,
                 "num_nodes": int(data.num_nodes),
                 "connections_to_keep": connections_to_keep,
@@ -173,7 +181,13 @@ def main():
     split = {key: value.view(-1).long().to(device) for key, value in split.items()}
 
     teacher_logits = None
+    teacher_preparation_seconds = 0.0
+    peak_teacher_preparation_memory_bytes = 0
     if args.loss_mode == "kd":
+        torch.cuda.reset_peak_memory_stats(device)
+        torch.cuda.synchronize(device)
+        teacher_preparation_started = time.perf_counter()
+
         teacher_checkpoint = torch.load(
             args.teacher_checkpoint,
             map_location=device,
@@ -200,6 +214,13 @@ def main():
             teacher_logits = teacher(x, full_edge_index).detach()
         del teacher
         torch.cuda.empty_cache()
+        torch.cuda.synchronize(device)
+        teacher_preparation_seconds = (
+            time.perf_counter() - teacher_preparation_started
+        )
+        peak_teacher_preparation_memory_bytes = int(
+            torch.cuda.max_memory_allocated(device)
+        )
     
     model = build_model(
         architecture=args.model_architecture,
@@ -292,7 +313,38 @@ def main():
             "test_accuracy": ogb_accuracy(evaluator, final_logits, y, split["test"]),
             "training_seconds": training_seconds,
             "peak_gpu_memory_bytes": int(torch.cuda.max_memory_allocated(device)),
+            "teacher_preparation_seconds": teacher_preparation_seconds,
+            "peak_teacher_preparation_memory_bytes": (
+                peak_teacher_preparation_memory_bytes
+            ),
         }
+
+        if teacher_logits is not None:
+            for split_name, indices in split.items():
+                student_split_logits = final_logits[indices]
+                teacher_split_logits = teacher_logits[indices]
+                metrics[f"teacher_{split_name}_accuracy"] = ogb_accuracy(
+                    evaluator,
+                    teacher_logits,
+                    y,
+                    indices,
+                )
+                metrics[f"teacher_student_{split_name}_agreement"] = float(
+                    (
+                        student_split_logits.argmax(dim=-1)
+                        == teacher_split_logits.argmax(dim=-1)
+                    )
+                    .float()
+                    .mean()
+                    .item()
+                )
+                metrics[f"teacher_student_{split_name}_kl"] = float(
+                    F.kl_div(
+                        F.log_softmax(student_split_logits, dim=-1),
+                        F.softmax(teacher_split_logits, dim=-1),
+                        reduction="batchmean",
+                    ).item()
+                )
 
     # run_dir = Path(
     #     args.run_dir or f"runs/ogbn_arxiv_{args.method}_seed{args.seed}"
@@ -301,6 +353,7 @@ def main():
     config = {
         "dataset": "ogbn-arxiv",
         "method": args.method,
+        "graph_selector": graph_selector,
         "data_root": args.root,
         "split": "official OGB train/valid/test",
         "edge_preprocessing": "make undirected, then coalesce duplicates",

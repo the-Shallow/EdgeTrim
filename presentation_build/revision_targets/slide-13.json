@@ -1,0 +1,15 @@
+{"schema":"openai.presentation.layout/v5","unit":"px","slide":{"id":"sl/hgzapcr6","index":12,"layout":{"id":"ly/14ra9krq","name":"Blank"},"backgroundColor":"rgba(18,42,41,1)","position":{"left":0,"top":0,"width":1280,"height":720}},
+"elements":[
+{"id":"sh/u9ofyp43","kind":"textbox","position":{"left":64,"top":28,"width":560,"height":22},"text":"13  /  STRONGER-TEACHER RESULTS","style":{"fontSize":13,"typeface":"Aptos","color":"#E4BD67","bold":true,"alignment":"left"},"geometry":"rect","lineWidth":0},
+{"id":"sh/q50nydsj","kind":"textbox","position":{"left":64,"top":66,"width":1152,"height":62},"text":"Stronger teacher improves KD but CE still leads","style":{"fontSize":42,"typeface":"Georgia","color":"#F4F3EB","bold":true,"alignment":"left"},"geometry":"rect","lineWidth":0},
+{"id":"sh/bq9orito","kind":"textbox","position":{"left":66,"top":132,"width":1110,"height":42},"text":"Three-seed mean test accuracy on teacher-guided sparse graphs","style":{"fontSize":20,"typeface":"Aptos","color":"#D8E1D9","alignment":"left"},"geometry":"rect","lineWidth":0},
+{"id":"sh/o3i5w3ad","kind":"shape","position":{"left":64,"top":680,"width":1152,"height":0},"geometry":"line","lineColor":"#44605A","lineWidth":1},
+{"id":"sh/p4r6p8by","kind":"textbox","position":{"left":64,"top":689,"width":620,"height":18},"text":"EdgeTrim-KD  |  Research update","style":{"fontSize":12,"typeface":"Aptos","color":"#AABBB2","alignment":"left"},"geometry":"rect","lineWidth":0},
+{"id":"sh/21gnuts7","kind":"textbox","position":{"left":1164,"top":689,"width":52,"height":18},"text":"13","style":{"fontSize":12,"typeface":"Aptos","color":"#AABBB2","alignment":"right"},"geometry":"rect","lineWidth":0},
+{"id":"ch/va9cby1k","kind":"chart","name":"Chart","position":{"left":68,"top":202,"width":818,"height":418},"chartType":"line","title":"Accuracy by removal level"},
+{"id":"sh/gzy5s3a1","kind":"textbox","position":{"left":915,"top":238,"width":270,"height":22},"text":"KD gain vs. old teacher","style":{"fontSize":15,"typeface":"Aptos","color":"#E4BD67","bold":true,"alignment":"left"},"geometry":"rect","lineWidth":0},
+{"id":"sh/1076lobm","kind":"textbox","position":{"left":915,"top":271,"width":260,"height":88},"text":"+1.15 to\n+1.50 pp","style":{"fontSize":34,"typeface":"Georgia","color":"#72C8BE","bold":true,"alignment":"left"},"geometry":"rect","lineWidth":0},
+{"id":"sh/hcfy9k3u","kind":"textbox","position":{"left":915,"top":380,"width":250,"height":74},"text":"Yet strong-teacher KD remains 0.33–0.71 pp below matched CE.","style":{"fontSize":18,"typeface":"Aptos","color":"#D8E1D9","alignment":"left"},"geometry":"rect","lineWidth":0},
+{"id":"sh/gb6x0zm9","kind":"shape","position":{"left":910,"top":487,"width":284,"height":84},"geometry":"roundRect","fillColor":"#1B3937","lineColor":"#44605A","lineWidth":1},
+{"id":"sh/vaxg7ulo","kind":"textbox","position":{"left":928,"top":503,"width":248,"height":54},"text":"RQ3 answer so far: a better teacher helps, but KD still does not beat CE.","style":{"fontSize":17,"typeface":"Aptos","color":"#E4BD67","bold":true,"alignment":"center"},"geometry":"rect","lineWidth":0}
+]}

@@ -1,0 +1,18 @@
+{"schema":"openai.presentation.layout/v5","unit":"px","slide":{"id":"sl/8f2psfyx","index":11,"layout":{"id":"ly/14ra9krq","name":"Blank"},"backgroundColor":"rgba(18,42,41,1)","position":{"left":0,"top":0,"width":1280,"height":720}},
+"elements":[
+{"id":"sh/mps7a5or","kind":"textbox","position":{"left":64,"top":28,"width":560,"height":22},"text":"12  /  TEACHER-STRENGTH FOLLOW-UP","style":{"fontSize":13,"typeface":"Aptos","color":"#E4BD67","bold":true,"alignment":"left"},"geometry":"rect","lineWidth":0},
+{"id":"sh/1gbm9s3a","kind":"textbox","position":{"left":64,"top":66,"width":1152,"height":62},"text":"A larger teacher improved its own predictions","style":{"fontSize":42,"typeface":"Georgia","color":"#F4F3EB","bold":true,"alignment":"left"},"geometry":"rect","lineWidth":0},
+{"id":"sh/0f2lgnmp","kind":"textbox","position":{"left":66,"top":132,"width":1110,"height":42},"text":"We tested whether the original teacher provided weak distillation targets","style":{"fontSize":20,"typeface":"Aptos","color":"#D8E1D9","alignment":"left"},"geometry":"rect","lineWidth":0},
+{"id":"sh/ra943il8","kind":"shape","position":{"left":64,"top":680,"width":1152,"height":0},"geometry":"line","lineColor":"#44605A","lineWidth":1},
+{"id":"sh/q903ad4n","kind":"textbox","position":{"left":64,"top":689,"width":620,"height":18},"text":"EdgeTrim-KD  |  Research update","style":{"fontSize":12,"typeface":"Aptos","color":"#AABBB2","alignment":"left"},"geometry":"rect","lineWidth":0},
+{"id":"sh/dcbm583y","kind":"textbox","position":{"left":1164,"top":689,"width":52,"height":18},"text":"12","style":{"fontSize":12,"typeface":"Aptos","color":"#AABBB2","alignment":"right"},"geometry":"rect","lineWidth":0},
+{"id":"ch/ova1cfah","kind":"chart","name":"Chart","position":{"left":78,"top":222,"width":610,"height":356},"chartType":"bar","title":"Full-graph teacher test accuracy"},
+{"id":"sh/b6d4f2lc","kind":"textbox","position":{"left":765,"top":238,"width":340,"height":54},"text":"+4.31 pp","style":{"fontSize":38,"typeface":"Georgia","color":"#E4BD67","bold":true,"alignment":"left"},"geometry":"rect","lineWidth":0},
+{"id":"sh/a543mx4r","kind":"textbox","position":{"left":768,"top":292,"width":390,"height":25},"text":"mean test-accuracy gain","style":{"fontSize":17,"typeface":"Aptos","color":"#D8E1D9","alignment":"left"},"geometry":"rect","lineWidth":0},
+{"id":"sh/wvupgz6t","kind":"shape","position":{"left":768,"top":341,"width":406,"height":0},"geometry":"line","lineColor":"#44605A","lineWidth":1},
+{"id":"sh/xw3q94ne","kind":"textbox","position":{"left":765,"top":367,"width":160,"height":48},"text":"5.1×","style":{"fontSize":34,"typeface":"Georgia","color":"#72C8BE","bold":true,"alignment":"left"},"geometry":"rect","lineWidth":0},
+{"id":"sh/atc7epon","kind":"textbox","position":{"left":906,"top":382,"width":255,"height":24},"text":"more parameters","style":{"fontSize":17,"typeface":"Aptos","color":"#D8E1D9","alignment":"left"},"geometry":"rect","lineWidth":0},
+{"id":"sh/bulo7u58","kind":"textbox","position":{"left":765,"top":432,"width":160,"height":48},"text":"3.2×","style":{"fontSize":34,"typeface":"Georgia","color":"#E47E67","bold":true,"alignment":"left"},"geometry":"rect","lineWidth":0},
+{"id":"sh/orapcf6h","kind":"textbox","position":{"left":906,"top":447,"width":300,"height":24},"text":"teacher inference latency","style":{"fontSize":17,"typeface":"Aptos","color":"#D8E1D9","alignment":"left"},"geometry":"rect","lineWidth":0},
+{"id":"sh/9sj65kn2","kind":"textbox","position":{"left":765,"top":522,"width":408,"height":62},"text":"A stronger source may help KD, but its offline and inference costs also rise.","style":{"fontSize":19,"typeface":"Aptos","color":"#E4BD67","bold":true,"alignment":"left"},"geometry":"rect","lineWidth":0}
+]}

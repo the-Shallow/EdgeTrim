@@ -17,6 +17,9 @@ All final timing and memory measurements use the same hardware protocol as the e
 - `submit_kd_sweep40.sh`: verify the seed-0 strong teacher and selected graph, then submit the 12-task KD sweep.
 - `train_kd_confirm40.slurm`: confirm the two seed-0 sweep finalists (`alpha=0.75, T=2` and `alpha=0.5, T=2`) on matched teachers and selected graphs for seeds 1 and 2.
 - `submit_kd_confirm40.sh`: verify the required seed-1/2 teacher and graph artifacts, then submit the four confirmation jobs.
+- `train_controlled_kd_grid.slurm`: train tuned KD students on both degree- and teacher-selected graphs for three budgets and three seeds (18 jobs).
+- `profile_controlled_kd_grid.slurm`: profile all 18 controlled KD checkpoints on A30.
+- `submit_controlled_kd_grid.sh`: accept the validation-selected alpha and temperature, verify all prerequisite graphs and teachers, then submit training and profiling with dependencies.
 - `score_teacher_edges.slurm`: create nine teacher-selected graphs from the final long-horizon teachers.
 - `train_pruned_grid.slurm`: train random, degree, and feature baselines for three budgets and three seeds with the final long-horizon protocol (27 jobs).
 - `train_teacher_students.slurm`: train paired width-128 CE and KD students on the nine teacher-selected graphs with the final long-horizon protocol (18 jobs).
@@ -72,6 +75,14 @@ The seed-0 sweep selected `alpha=0.75, T=2` and `alpha=0.5, T=2` as the top two 
 ```bash
 bash hpc/submit_kd_confirm40.sh
 ```
+
+After selecting the final hyperparameters from three-seed validation accuracy, submit the controlled selector-by-loss grid. For example:
+
+```bash
+bash hpc/submit_controlled_kd_grid.sh 0.5 2.0
+```
+
+This produces tuned KD results on both degree- and teacher-selected graphs. Existing CE results provide the other two cells of the controlled 2-by-2 comparison. New KD metrics also record teacher-logit preparation time, preparation memory, teacher accuracy, student-teacher agreement, and KL divergence.
 
 ## Training-horizon sensitivity
 
